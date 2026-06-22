@@ -951,6 +951,63 @@ body {
   </div>
 </div>
 
+<!-- MODAL EDITAR PROJETO -->
+<div class="modal-overlay" id="modal-editar">
+  <div class="modal">
+    <div class="modal-title">✏️ Editar Projeto</div>
+    <div class="modal-sub">Atualize as informações do projeto</div>
+
+    <input type="hidden" id="edit-id">
+
+    <div class="form-group">
+      <label class="form-label">Nome do projeto</label>
+      <input class="form-input" id="edit-nome" placeholder="Ex: Automação de OEs">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Descrição</label>
+      <textarea class="form-textarea" id="edit-desc" placeholder="O que é esse projeto e qual seu objetivo?"></textarea>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Status</label>
+        <select class="form-select" id="edit-status">
+          <option value="planejando">Planejando</option>
+          <option value="andamento">Em andamento</option>
+          <option value="concluido">Concluído</option>
+          <option value="pausado">Pausado</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Prazo</label>
+        <input class="form-input" id="edit-prazo" type="month">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Data de início</label>
+        <input class="form-input" id="edit-inicio" type="date">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Data de conclusão</label>
+        <input class="form-input" id="edit-conclusao" type="date">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Próximo passo</label>
+      <input class="form-input" id="edit-next" placeholder="Qual é a próxima ação concreta?">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Progresso (%)</label>
+      <input class="form-input" id="edit-progresso" type="number" min="0" max="100" placeholder="0">
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="fecharModalEditar()">Cancelar</button>
+      <button class="btn-primary" onclick="salvarEdicao()" style="flex:2;justify-content:center">💾 Salvar alterações</button>
+    </div>
+  </div>
+</div>
+
 <!-- TOAST -->
 <div class="toast" id="toast">
   <span id="toast-icon">✨</span>
@@ -1055,7 +1112,10 @@ function renderProjetos() {
       </div>
       <div class="project-meta">
         <span class="project-prazo">📅 ${p.prazo ? formatarMes(p.prazo) : "Sem prazo"}</span>
-        <span style="font-size:11px;color:var(--muted);cursor:pointer" onclick="removerProjeto(${p.id})">🗑</span>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <span style="font-size:12px;color:var(--violet);cursor:pointer;font-weight:600;" onclick="editarProjeto(${p.id})">✏️ Editar</span>
+          <span style="font-size:11px;color:var(--muted);cursor:pointer" onclick="removerProjeto(${p.id})">🗑</span>
+        </div>
       </div>
     </div>
   `).join("");
@@ -1111,6 +1171,44 @@ function removerProjeto(id) {
   projetos = projetos.filter(p => p.id !== id);
   renderProjetos();
   toast("🗑️", "Projeto removido.");
+}
+
+function editarProjeto(id) {
+  const p = projetos.find(x => x.id === id);
+  if (!p) return;
+  document.getElementById("edit-id").value = p.id;
+  document.getElementById("edit-nome").value = p.nome;
+  document.getElementById("edit-desc").value = p.desc;
+  document.getElementById("edit-status").value = p.status;
+  document.getElementById("edit-prazo").value = p.prazo || "";
+  document.getElementById("edit-inicio").value = p.inicio || "";
+  document.getElementById("edit-conclusao").value = p.conclusao || "";
+  document.getElementById("edit-next").value = p.next || "";
+  document.getElementById("edit-progresso").value = p.progresso || 0;
+  document.getElementById("modal-editar").classList.add("open");
+}
+
+function fecharModalEditar() {
+  document.getElementById("modal-editar").classList.remove("open");
+}
+
+function salvarEdicao() {
+  const id = parseInt(document.getElementById("edit-id").value);
+  const p = projetos.find(x => x.id === id);
+  if (!p) return;
+
+  p.nome      = document.getElementById("edit-nome").value.trim();
+  p.desc      = document.getElementById("edit-desc").value.trim();
+  p.status    = document.getElementById("edit-status").value;
+  p.prazo     = document.getElementById("edit-prazo").value;
+  p.inicio    = document.getElementById("edit-inicio").value;
+  p.conclusao = document.getElementById("edit-conclusao").value;
+  p.next      = document.getElementById("edit-next").value.trim();
+  p.progresso = parseInt(document.getElementById("edit-progresso").value) || 0;
+
+  fecharModalEditar();
+  renderProjetos();
+  toast("💾", "Projeto atualizado!");
 }
 
 function mudarStatus(id, novoStatus) {
@@ -1174,6 +1272,10 @@ function toast(icon, msg) {
 
 document.getElementById("modal-projeto").addEventListener("click", function(e) {
   if (e.target === this) fecharModal();
+});
+
+document.getElementById("modal-editar").addEventListener("click", function(e) {
+  if (e.target === this) fecharModalEditar();
 });
 
 renderProjetos();
