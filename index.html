@@ -349,6 +349,34 @@ body {
   display: flex; align-items: center; gap: 5px;
 }
 
+.project-dates {
+  display: flex;
+  gap: 12px;
+  font-size: 11px;
+  color: var(--muted);
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.status-select {
+  border: none;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.status-select.tag-andamento  { background: rgba(59,130,246,0.15); color: var(--blue); }
+.status-select.tag-concluido  { background: rgba(16,185,129,0.15); color: var(--green); }
+.status-select.tag-planejando { background: rgba(245,158,11,0.15); color: #D97706; }
+.status-select.tag-pausado    { background: rgba(107,107,138,0.15); color: var(--muted); }
+
 .project-next {
   background: var(--bg3);
   border-radius: 8px;
@@ -897,6 +925,16 @@ body {
         <input class="form-input" id="proj-prazo" type="month">
       </div>
     </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Data de início</label>
+        <input class="form-input" id="proj-inicio" type="date">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Data de conclusão</label>
+        <input class="form-input" id="proj-conclusao" type="date">
+      </div>
+    </div>
     <div class="form-group">
       <label class="form-label">Próximo passo</label>
       <input class="form-input" id="proj-next" placeholder="Qual é a próxima ação concreta?">
@@ -945,21 +983,21 @@ let projetos = [
   {
     id: 1, nome: "Automação de Aprovação de OEs",
     desc: "Script Google Apps Script para notificar analistas via e-mail e atualizar o Status Routing automaticamente na planilha.",
-    status: "andamento", prazo: "2025-07", progresso: 60,
+    status: "andamento", prazo: "2025-07", progresso: 60, inicio: "2025-06-22", conclusao: "",
     next: "Aguardar aprovação da gestão para implementar na planilha de produção",
     notas: ""
   },
   {
     id: 2, nome: "Mural de Reconhecimento",
     desc: "App web com os pilares do DNA Meli para reconhecimento horizontal do time, integrado ao Google Sheets e Google Chat.",
-    status: "andamento", prazo: "2025-07", progresso: 35,
+    status: "andamento", prazo: "2025-07", progresso: 35, inicio: "2025-06-22", conclusao: "",
     next: "Conseguir acesso ao repositório GitHub com a colega do time",
     notas: ""
   },
   {
     id: 3, nome: "Planner Pessoal & PDI",
     desc: "Ferramenta de organização pessoal para acompanhar projetos e desenvolvimento profissional de forma visual.",
-    status: "planejando", prazo: "2025-08", progresso: 15,
+    status: "planejando", prazo: "2025-08", progresso: 15, inicio: "2025-06-22", conclusao: "",
     next: "Definir onde hospedar e como persistir os dados",
     notas: ""
   },
@@ -1000,12 +1038,21 @@ function renderProjetos() {
   grid.innerHTML = projetos.map(p => `
     <div class="project-card">
       <div class="project-card-top">
-        <span class="project-tag ${STATUS_TAG[p.status]}">${STATUS_LABEL[p.status]}</span>
+        <select class="status-select ${STATUS_TAG[p.status]}" onchange="mudarStatus(${p.id}, this.value)">
+          <option value="planejando" ${p.status==="planejando"?"selected":""}>📋 Planejando</option>
+          <option value="andamento"  ${p.status==="andamento"?"selected":""}>🔄 Em andamento</option>
+          <option value="pausado"    ${p.status==="pausado"?"selected":""}>⏸️ Pausado</option>
+          <option value="concluido"  ${p.status==="concluido"?"selected":""}>✅ Concluído</option>
+        </select>
         <div class="progress-circle">${circulo(p.progresso, CIRCLE_COLORS[p.status])}</div>
       </div>
       <div class="project-name">${p.nome}</div>
       <div class="project-desc">${p.desc}</div>
       ${p.next ? `<div class="project-next">→ <span>${p.next}</span></div>` : ""}
+      <div class="project-dates">
+        <span>🗓️ Início: ${p.inicio ? formatarData(p.inicio) : "—"}</span>
+        <span>🏁 Conclusão: ${p.conclusao ? formatarData(p.conclusao) : "—"}</span>
+      </div>
       <div class="project-meta">
         <span class="project-prazo">📅 ${p.prazo ? formatarMes(p.prazo) : "Sem prazo"}</span>
         <span style="font-size:11px;color:var(--muted);cursor:pointer" onclick="removerProjeto(${p.id})">🗑</span>
@@ -1036,7 +1083,7 @@ function abrirModalProjeto() {
 
 function fecharModal() {
   document.getElementById("modal-projeto").classList.remove("open");
-  ["proj-nome","proj-desc","proj-next","proj-progresso"].forEach(id => document.getElementById(id).value = "");
+  ["proj-nome","proj-desc","proj-next","proj-progresso","proj-inicio","proj-conclusao"].forEach(id => document.getElementById(id).value = "");
   document.getElementById("proj-status").value = "planejando";
   document.getElementById("proj-prazo").value = "";
 }
@@ -1049,9 +1096,12 @@ function salvarProjeto() {
   const next = document.getElementById("proj-next").value.trim();
   const progresso = parseInt(document.getElementById("proj-progresso").value) || 0;
 
+  const inicio = document.getElementById("proj-inicio").value;
+  const conclusao = document.getElementById("proj-conclusao").value;
+
   if (!nome) { toast("⚠️", "Dá um nome pro projeto primeiro!"); return; }
 
-  projetos.unshift({ id: Date.now(), nome, desc, status, prazo, progresso, next, notas: "" });
+  projetos.unshift({ id: Date.now(), nome, desc, status, prazo, progresso, inicio, conclusao, next, notas: "" });
   fecharModal();
   renderProjetos();
   toast("✨", `"${nome}" adicionado!`);
@@ -1061,6 +1111,23 @@ function removerProjeto(id) {
   projetos = projetos.filter(p => p.id !== id);
   renderProjetos();
   toast("🗑️", "Projeto removido.");
+}
+
+function mudarStatus(id, novoStatus) {
+  const p = projetos.find(x => x.id === id);
+  if (!p) return;
+  p.status = novoStatus;
+  if (novoStatus === "concluido" && !p.conclusao) {
+    p.conclusao = new Date().toISOString().split("T")[0];
+  }
+  renderProjetos();
+  toast("🔄", "Status atualizado!");
+}
+
+function formatarData(d) {
+  if (!d) return "—";
+  const [y, m, dia] = d.split("-");
+  return dia + "/" + m + "/" + y;
 }
 
 function toggleAcao(el) {
