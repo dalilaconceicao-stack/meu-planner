@@ -1312,7 +1312,7 @@ function renderProjects(lista) {
       <div style="font-size:40px;margin-bottom:12px">🌸</div>
       <p style="color:var(--muted);font-size:14px;">Nenhum projeto encontrado.</p>
     </div>`;
-    updateStats(); return;
+    atualizarStats(); return;
   }
   grid.innerHTML = lista.map(p => {
     const colorClass = CARD_COLORS[p.color % CARD_COLORS.length];
@@ -1406,7 +1406,7 @@ function limparFiltros() {
 
 function registrarAprendizadoNoPDI(projeto) {
   const data = projeto.conclusao
-    ? formatarData(projeto.conclusao)
+    ? formatDate(projeto.conclusao)
     : new Date().toLocaleDateString('pt-BR');
 
   const entrada = `✅ ${projeto.nome} — concluído em ${data}` +
