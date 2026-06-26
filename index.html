@@ -1063,93 +1063,58 @@ body {
 </div>
 
 <script>
-const API_URL = "https://script.google.com/a/macros/mercadolivre.com/s/AKfycbxCniTqDhfWM4SBXHzAjfd3DmAcjWaWPWbCvn3aw20ui-9SpVXyGgSP8qHbNcXtTUCM/exec";
-
 // ============================================================
-// CARREGAR E SALVAR NO GOOGLE SHEETS
+// SALVAR E CARREGAR COM LOCALSTORAGE
 // ============================================================
 
-async function carregarDados() {
-  try {
-    mostrarCarregando(true);
+function carregarDados() {
+  // Carrega projetos
+  const projetosSalvos = localStorage.getItem("planner_projetos");
+  if (projetosSalvos) {
+    try { projetos = JSON.parse(projetosSalvos); } catch {}
+  }
 
-    // Carrega projetos
-    const rProjetos = await fetch(API_URL + "?acao=carregarProjetos");
-    const dProjetos = await rProjetos.json();
-    if (dProjetos.sucesso && dProjetos.projetos.length > 0) {
-      projetos = dProjetos.projetos.map(p => ({...p, id: Number(p.id) || Date.now()}));
-    }
-
-    // Carrega PDI
-    const rPDI = await fetch(API_URL + "?acao=carregarPDI");
-    const dPDI = await rPDI.json();
-    if (dPDI.sucesso && dPDI.pdi) {
-      const pdi = dPDI.pdi;
+  // Carrega PDI
+  const pdiSalvo = localStorage.getItem("planner_pdi");
+  if (pdiSalvo) {
+    try {
+      const pdi = JSON.parse(pdiSalvo);
       if (pdi.ondeEstou)  document.getElementById("pdi-onde-estou").value = pdi.ondeEstou;
       if (pdi.ondeVou)    document.getElementById("pdi-onde-vou").value   = pdi.ondeVou;
       if (pdi.resultados) document.getElementById("pdi-resultados").value = pdi.resultados;
       if (pdi.acoes && pdi.acoes.length > 0) renderAcoes(pdi.acoes);
-    }
-
-    renderProjetos();
-    mostrarCarregando(false);
-  } catch (err) {
-    mostrarCarregando(false);
-    toast("⚠️", "Erro ao carregar dados.");
-    console.error(err);
+    } catch {}
   }
+
+  renderProjetos();
 }
 
-async function salvarProjetosSheets() {
-  try {
-    const res = await fetch(API_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ acao: "salvarProjetos", projetos }),
-    });
-    const data = await res.json();
-    if (!data.sucesso) console.error("Erro ao salvar projetos:", data.erro);
-  } catch (err) {
-    console.error("Erro ao salvar projetos:", err);
-  }
+function salvarProjetosSheets() {
+  localStorage.setItem("planner_projetos", JSON.stringify(projetos));
 }
 
-async function salvarPDISheets() {
-  try {
-    const acoes = [];
-    document.querySelectorAll(".acao-item").forEach(item => {
-      const check = item.querySelector(".acao-check");
-      const texto = item.querySelector(".acao-text");
-      const prazo = item.querySelector(".acao-prazo");
-      acoes.push({
-        texto: texto ? texto.textContent : "",
-        prazo: prazo ? prazo.textContent : "",
-        done: check ? check.classList.contains("done") : false,
-      });
+function salvarPDISheets() {
+  const acoes = [];
+  document.querySelectorAll(".acao-item").forEach(item => {
+    const check = item.querySelector(".acao-check");
+    const texto = item.querySelector(".acao-text");
+    const prazo = item.querySelector(".acao-prazo");
+    acoes.push({
+      texto: texto ? texto.textContent : "",
+      prazo: prazo ? prazo.textContent : "",
+      done: check ? check.classList.contains("done") : false,
     });
+  });
 
-    const pdi = {
-      ondeEstou:  document.getElementById("pdi-onde-estou").value,
-      ondeVou:    document.getElementById("pdi-onde-vou").value,
-      resultados: document.getElementById("pdi-resultados").value,
-      acoes,
-    };
+  const pdi = {
+    ondeEstou:  document.getElementById("pdi-onde-estou").value,
+    ondeVou:    document.getElementById("pdi-onde-vou").value,
+    resultados: document.getElementById("pdi-resultados").value,
+    acoes,
+  };
 
-    const res = await fetch(API_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ acao: "salvarPDI", pdi }),
-    });
-    const data = await res.json();
-    if (data.sucesso) {
-      toast("💾", "PDI salvo no Google Sheets!");
-    } else {
-      toast("⚠️", "Erro ao salvar PDI.");
-    }
-  } catch (err) {
-    toast("⚠️", "Erro ao salvar PDI.");
-    console.error(err);
-  }
+  localStorage.setItem("planner_pdi", JSON.stringify(pdi));
+  toast("💾", "PDI salvo com sucesso!");
 }
 
 function renderAcoes(acoes) {
@@ -1162,11 +1127,6 @@ function renderAcoes(acoes) {
     </div>
   `).join("");
   atualizarAcoesPDI();
-}
-
-function mostrarCarregando(sim) {
-  const badge = document.getElementById("badge-projetos");
-  if (sim) badge.textContent = "...";
 }
 
 const STATUS_LABEL = {
