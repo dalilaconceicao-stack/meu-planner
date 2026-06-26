@@ -349,6 +349,39 @@ body {
   display: flex; align-items: center; gap: 5px;
 }
 
+.project-arquivos {
+  margin-bottom: 12px;
+}
+
+.arquivo-item {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 12px; color: var(--violet);
+  padding: 6px 10px;
+  background: rgba(124,58,237,0.06);
+  border-radius: 8px;
+  margin-bottom: 6px;
+  text-decoration: none;
+}
+
+.arquivo-item:hover { background: rgba(124,58,237,0.12); }
+
+.btn-anexar {
+  display: flex; align-items: center; gap: 6px;
+  background: none; border: 1px dashed var(--border);
+  border-radius: 8px; padding: 6px 12px;
+  font-size: 11px; color: var(--muted);
+  cursor: pointer; font-family: 'Inter', sans-serif;
+  transition: all 0.2s; margin-top: 4px;
+}
+
+.btn-anexar:hover { border-color: var(--violet); color: var(--violet); }
+
+.upload-loading {
+  font-size: 11px; color: var(--muted);
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 10px;
+}
+
 .project-notas {
   background: #FFFBEB;
   border-left: 3px solid var(--gold);
@@ -1224,6 +1257,16 @@ function renderProjetos() {
       <div class="project-desc">${p.desc}</div>
       ${p.next ? `<div class="project-next">→ <span>${p.next}</span></div>` : ""}
       ${p.notas ? `<div class="project-notas">📝 ${p.notas}</div>` : ""}
+      <div class="project-arquivos" id="arquivos-${p.id}">
+        ${(p.arquivos || []).map(a => `
+          <a class="arquivo-item" href="${a.url}" target="_blank">📎 ${a.nome}</a>
+        `).join("")}
+        <button class="btn-anexar" onclick="document.getElementById('input-file-${p.id}').click()">
+          📎 Anexar arquivo
+        </button>
+        <input type="file" id="input-file-${p.id}" style="display:none" onchange="uploadArquivo(event, ${p.id})">
+        <div class="upload-loading" id="loading-${p.id}" style="display:none">⏳ Enviando...</div>
+      </div>
       <div class="project-dates">
         <span>🗓️ Início: ${p.inicio ? formatarData(p.inicio) : "—"}</span>
         <span>🏁 Conclusão: ${p.conclusao ? formatarData(p.conclusao) : "—"}</span>
@@ -1332,6 +1375,52 @@ function salvarEdicao() {
   renderProjetos();
   salvarProjetosSheets();
   toast("💾", "Projeto atualizado!");
+}
+
+async function uploadArquivo(event, projetoId) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const loading = document.getElementById("loading-" + projetoId);
+  loading.style.display = "flex";
+
+  try {
+    const base64 = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result.split(",")[1]);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+
+    const res = await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        acao: "uploadArquivo",
+        nome: file.name,
+        tipo: file.type,
+        base64,
+        projetoId,
+      }),
+      mode: "no-cors"
+    });
+
+    // Como usamos no-cors, salvamos localmente e sincronizamos
+    const p = projetos.find(x => x.id === projetoId);
+    if (p) {
+      if (!p.arquivos) p.arquivos = [];
+      p.arquivos.push({ nome: file.name, url: "#" });
+      salvarProjetosSheets();
+      renderProjetos();
+    }
+
+    loading.style.display = "none";
+    toast("📎", `"${file.name}" anexado!`);
+  } catch (err) {
+    loading.style.display = "none";
+    toast("⚠️", "Erro ao anexar arquivo.");
+    console.error(err);
+  }
 }
 
 function mudarStatus(id, novoStatus) {
