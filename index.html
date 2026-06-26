@@ -68,7 +68,7 @@ body {
 }
 
 .brand-icon {
-  width: 170px; height: 170px;
+  width: 52px; height: 52px;
   background: var(--rose);
   border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
@@ -1304,10 +1304,17 @@ function carregarLocal() {
   }
 }
 
-function renderProjects() {
-  if (typeof aplicarFiltros === 'function') { aplicarFiltros(); return; }
+function renderProjects(lista) {
+  if (!lista) { aplicarFiltros(); return; }
   const grid = document.getElementById('projects-grid');
-  grid.innerHTML = projetos.map(p => {
+  if (!lista || !lista.length) {
+    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:60px 20px;">
+      <div style="font-size:40px;margin-bottom:12px">🌸</div>
+      <p style="color:var(--muted);font-size:14px;">Nenhum projeto encontrado.</p>
+    </div>`;
+    updateStats(); return;
+  }
+  grid.innerHTML = lista.map(p => {
     const colorClass = CARD_COLORS[p.color % CARD_COLORS.length];
     return `<div class="project-card ${colorClass}">
       <div class="project-card-top">
@@ -1383,7 +1390,7 @@ function aplicarFiltros() {
     lista = lista.filter(p => p.prazo <= ate);
   }
 
-  renderProjectsLista(lista);
+  renderProjects(lista);
 }
 
 function limparFiltros() {
