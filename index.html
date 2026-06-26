@@ -1102,12 +1102,13 @@ async function carregarDados() {
 
 async function salvarProjetosSheets() {
   try {
-    await fetch(API_URL, {
+    const res = await fetch(API_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ acao: "salvarProjetos", projetos }),
-      mode: "no-cors"
     });
+    const data = await res.json();
+    if (!data.sucesso) console.error("Erro ao salvar projetos:", data.erro);
   } catch (err) {
     console.error("Erro ao salvar projetos:", err);
   }
@@ -1134,14 +1135,17 @@ async function salvarPDISheets() {
       acoes,
     };
 
-    await fetch(API_URL, {
+    const res = await fetch(API_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ acao: "salvarPDI", pdi }),
-      mode: "no-cors"
     });
-
-    toast("💾", "PDI salvo no Google Sheets!");
+    const data = await res.json();
+    if (data.sucesso) {
+      toast("💾", "PDI salvo no Google Sheets!");
+    } else {
+      toast("⚠️", "Erro ao salvar PDI.");
+    }
   } catch (err) {
     toast("⚠️", "Erro ao salvar PDI.");
     console.error(err);
