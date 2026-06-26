@@ -324,7 +324,7 @@ body {
 .tag-concluido { background: #eaf3e8; color: var(--sage-dk); }
 .tag-planejando { background: #fdf5e0; color: #c07820; }
 .tag-pausado   { background: #f0eaf8; color: var(--lilac-dk); }
-.tag-cancelado   { background: #f0eaf8; color: var(--red-dk); }
+.tag-cancelado { background: #fde8e8; color: #c03030; }
 
 /* PROGRESS CIRCLE */
 .progress-circle {
@@ -396,6 +396,32 @@ body {
   margin-bottom: 12px;
 }
 
+.project-arquivos { margin-bottom: 10px; }
+
+.arquivo-item {
+  display: flex; align-items: center; gap: 7px;
+  font-size: 11px; color: var(--rose-dk);
+  padding: 5px 10px;
+  background: #fce8f3;
+  border-radius: 8px;
+  margin-bottom: 5px;
+  text-decoration: none;
+}
+
+.arquivo-item:hover { background: #f8d0e8; }
+
+.btn-anexar {
+  display: flex; align-items: center; gap: 6px;
+  background: none;
+  border: 1px dashed var(--border-md);
+  border-radius: 8px; padding: 5px 10px;
+  font-size: 11px; color: var(--muted);
+  cursor: pointer; font-family: 'DM Sans', sans-serif;
+  transition: all 0.2s; margin-top: 4px;
+}
+
+.btn-anexar:hover { border-color: var(--rose); color: var(--rose-dk); }
+
 .project-dates {
   display: flex;
   gap: 12px;
@@ -421,6 +447,7 @@ body {
 .status-select.tag-concluido { background: #eaf3e8; color: var(--sage-dk); }
 .status-select.tag-planejando { background: #fdf5e0; color: #c07820; }
 .status-select.tag-pausado   { background: #f0eaf8; color: var(--lilac-dk); }
+.tag-cancelado { background: #fde8e8; color: #c03030; }
 
 .project-next {
   background: var(--bg3);
@@ -1018,6 +1045,7 @@ body {
           <option value="andamento">Em andamento</option>
           <option value="concluido">Concluído</option>
           <option value="pausado">Pausado</option>
+          <option value="cancelado">Cancelado</option>
         </select>
       </div>
       <div class="form-group">
@@ -1086,7 +1114,7 @@ let projetos = [
 let nextId = 4;
 
 function getStatusLabel(s) {
-  const map = { andamento:'Em andamento', concluido:'Concluído', planejando:'Planejando', pausado:'Pausado',cancelado: 'Cancelado' };
+  const map = { andamento:'Em andamento', concluido:'Concluído', planejando:'Planejando', pausado:'Pausado', cancelado:'Cancelado' };
   return map[s] || s;
 }
 
@@ -1176,7 +1204,7 @@ function renderProjects() {
           <option value="andamento"  ${p.status==='andamento'?'selected':''}>Em andamento</option>
           <option value="concluido"  ${p.status==='concluido'?'selected':''}>Concluído</option>
           <option value="pausado"    ${p.status==='pausado'?'selected':''}>Pausado</option>
-          <option value="cancelado" ${p.status==='cancelado'?'selected':''}>Cancelado</option>
+          <option value="cancelado"  ${p.status==='cancelado'?'selected':''}>Cancelado</option>
         </select>
         ${renderProgress(p.progresso || 0, p.status)}
       </div>
@@ -1184,6 +1212,11 @@ function renderProjects() {
       <div class="project-desc">${p.desc}</div>
       ${p.next ? `<div class="project-notas">→ ${p.next}</div>` : ''}
       ${p.notas ? `<div class="project-anotacoes">📝 ${p.notas}</div>` : ''}
+      <div class="project-arquivos">
+        ${(p.arquivos || []).map(a => `<a class="arquivo-item" href="${a.url}" target="_blank">📎 ${a.nome}</a>`).join('')}
+        <button class="btn-anexar" onclick="document.getElementById('file-${p.id}').click()">📎 Anexar arquivo</button>
+        <input type="file" id="file-${p.id}" style="display:none" onchange="anexarArquivo(event, ${p.id})">
+      </div>
       <div class="project-dates">
         <span>🗓 Início: ${formatDate(p.inicio)}</span>
         <span>🏁 Conclusão: ${formatDate(p.conclusao)}</span>
@@ -1205,6 +1238,23 @@ function atualizarStats() {
   document.getElementById('stat-concluido').textContent = projetos.filter(p => p.status === 'concluido').length;
   document.getElementById('stat-planejando').textContent= projetos.filter(p => p.status === 'planejando').length;
   document.getElementById('badge-projetos').textContent  = projetos.length;
+}
+
+function anexarArquivo(event, id) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const p = projetos.find(x => x.id === id);
+  if (!p) return;
+  if (!p.arquivos) p.arquivos = [];
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    p.arquivos.push({ nome: file.name, url: e.target.result });
+    salvarLocal();
+    renderProjects();
+    mostrarToast('📎 ' + file.name + ' anexado!');
+  };
+  reader.readAsDataURL(file);
 }
 
 function mudarStatus(id, val) {
