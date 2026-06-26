@@ -4,32 +4,34 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Planner da Dali</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;900&display=swap');
-
 :root {
-  --bg:        #F4F6FB;
-  --bg2:       #FFFFFF;
-  --bg3:       #EEF1F8;
-  --border:    rgba(0,0,0,0.08);
-  --violet:    #7C3AED;
-  --violet-lt: #9D5FF5;
-  --gold:      #F59E0B;
-  --gold-lt:   #D97706;
-  --green:     #10B981;
-  --red:       #EF4444;
-  --blue:      #3B82F6;
-  --white:     #FFFFFF;
-  --text:      #1E1E2E;
-  --muted:     #8A8AAA;
-  --card:      #FFFFFF;
+  --bg:        #fdf6f9;
+  --bg2:       #ffffff;
+  --bg3:       #fce8f3;
+  --bg4:       #f3e8f8;
+  --border:    rgba(200,130,175,0.18);
+  --border-md: rgba(200,130,175,0.32);
+  --rose:      #e091b8;
+  --rose-dk:   #c070a0;
+  --lilac:     #b08ed4;
+  --lilac-dk:  #8a68b8;
+  --sage:      #8ebc88;
+  --sage-dk:   #5e8c58;
+  --amber:     #e8a84a;
+  --text:      #3a1f35;
+  --muted:     #b07898;
+  --card:      #ffffff;
   --radius:    14px;
+  --sidebar-bg: linear-gradient(170deg, #fce8f3 0%, #f3e8f8 100%);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  font-family: 'Inter', sans-serif;
+  font-family: 'DM Sans', sans-serif;
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
@@ -37,61 +39,70 @@ body {
   overflow: hidden;
 }
 
-/* SIDEBAR */
+/* ── SIDEBAR ── */
 .sidebar {
   width: 240px;
   min-height: 100vh;
-  background: var(--bg2);
-  border-right: 1px solid var(--border);
+  background: var(--sidebar-bg);
+  border-right: 1px solid var(--border-md);
   display: flex;
   flex-direction: column;
   padding: 28px 0;
   flex-shrink: 0;
+  position: relative;
+}
+
+.sidebar::after {
+  content: '🌸';
+  position: absolute;
+  bottom: 80px;
+  right: 12px;
+  font-size: 48px;
+  opacity: 0.07;
+  pointer-events: none;
 }
 
 .sidebar-brand {
-  padding: 0 24px 28px;
-  border-bottom: 1px solid var(--border);
+  padding: 0 22px 24px;
+  border-bottom: 1px solid var(--border-md);
 }
 
 .brand-icon {
-  width: 40px; height: 40px;
-  background: linear-gradient(135deg, var(--violet), var(--violet-lt));
-  border-radius: 10px;
+  width: 42px; height: 42px;
+  background: var(--rose);
+  border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
-  font-size: 18px;
+  font-size: 20px;
   margin-bottom: 12px;
+  box-shadow: 0 4px 12px rgba(224,145,184,0.35);
 }
 
 .brand-name {
   font-family: 'Playfair Display', serif;
   font-size: 18px;
-  font-weight: 900;
+  font-weight: 700;
   color: var(--text);
-  line-height: 1.1;
+  line-height: 1.2;
 }
 
 .brand-sub {
   font-size: 11px;
   color: var(--muted);
   margin-top: 3px;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.3px;
 }
 
-.sidebar-nav {
-  padding: 20px 12px;
-  flex: 1;
-}
+.sidebar-nav { padding: 18px 12px; flex: 1; }
 
 .nav-label {
-  font-size: 10px;
-  font-weight: 700;
+  font-size: 9px;
+  font-weight: 500;
   text-transform: uppercase;
-  letter-spacing: 1.5px;
+  letter-spacing: 1.8px;
   color: var(--muted);
-  padding: 0 12px;
-  margin-bottom: 8px;
-  margin-top: 20px;
+  padding: 0 10px;
+  margin-bottom: 6px;
+  margin-top: 18px;
 }
 
 .nav-label:first-child { margin-top: 0; }
@@ -100,122 +111,132 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 10px 12px;
-  border-radius: 10px;
+  padding: 9px 12px;
+  border-radius: 20px;
   cursor: pointer;
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 400;
   color: var(--muted);
   transition: all 0.2s;
   border: none;
   background: none;
   width: 100%;
   text-align: left;
-  font-family: 'Inter', sans-serif;
+  font-family: 'DM Sans', sans-serif;
 }
 
-.nav-item:hover { background: var(--bg3); color: var(--text); }
-.nav-item.active { background: rgba(124,58,237,0.10); color: var(--violet); }
+.nav-item:hover { background: rgba(255,255,255,0.55); color: var(--text); }
+
+.nav-item.active {
+  background: rgba(255,255,255,0.7);
+  color: var(--rose-dk);
+  font-weight: 500;
+  box-shadow: 0 1px 6px rgba(200,120,170,0.12);
+}
 
 .nav-item .nav-icon { font-size: 16px; width: 20px; text-align: center; }
 
 .nav-badge {
   margin-left: auto;
-  background: var(--violet);
+  background: var(--rose);
   color: white;
   font-size: 10px;
-  font-weight: 700;
+  font-weight: 600;
   padding: 2px 7px;
   border-radius: 10px;
 }
 
 .sidebar-footer {
-  padding: 16px 24px;
-  border-top: 1px solid var(--border);
+  padding: 16px 22px;
+  border-top: 1px solid var(--border-md);
 }
 
 .user-card {
   display: flex;
   align-items: center;
   gap: 10px;
+  background: rgba(255,255,255,0.55);
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
 }
 
 .user-avatar {
-  width: 36px; height: 36px;
+  width: 32px; height: 32px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--violet), var(--gold));
+  background: var(--rose-dk);
   display: flex; align-items: center; justify-content: center;
-  font-size: 14px; font-weight: 700; color: white;
+  font-size: 12px; font-weight: 600; color: white;
   flex-shrink: 0;
 }
 
-.user-name { font-size: 13px; font-weight: 600; color: var(--text); }.user-role { font-size: 11px; color: var(--muted); }
+.user-name { font-size: 12px; font-weight: 500; color: var(--text); }
+.user-role { font-size: 10px; color: var(--muted); }
 
-/* MAIN */
-.main {
-  flex: 1;
-  overflow-y: auto;
-  height: 100vh;
-}
+/* ── MAIN ── */
+.main { flex: 1; overflow-y: auto; height: 100vh; }
 
 .page { display: none; padding: 36px 40px; min-height: 100vh; }
 .page.active { display: block; }
 
-/* PAGE HEADER */
+/* ── PAGE HEADER ── */
 .page-header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  margin-bottom: 32px;
+  margin-bottom: 28px;
 }
 
 .page-title {
   font-family: 'Playfair Display', serif;
-  font-size: 32px;
-  font-weight: 900;
+  font-size: 30px;
+  font-weight: 700;
   color: var(--text);
   line-height: 1.1;
 }
 
 .page-subtitle {
-  font-size: 13px;
+  font-size: 12px;
   color: var(--muted);
-  margin-top: 6px;
+  margin-top: 5px;
+  font-style: italic;
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--violet), var(--violet-lt));
+  background: var(--rose);
   color: white;
   border: none;
-  padding: 11px 20px;
-  border-radius: 10px;
+  padding: 10px 20px;
+  border-radius: 20px;
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 500;
   cursor: pointer;
-  font-family: 'Inter', sans-serif;
+  font-family: 'DM Sans', sans-serif;
   display: flex; align-items: center; gap: 8px;
   transition: all 0.2s;
   white-space: nowrap;
+  box-shadow: 0 3px 12px rgba(224,145,184,0.4);
 }
 
 .btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(124,58,237,0.4);
+  background: var(--rose-dk);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(224,145,184,0.45);
 }
 
-/* STATS ROW */
+/* ── STATS ── */
 .stats-row {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
-  margin-bottom: 32px;
+  gap: 14px;
+  margin-bottom: 28px;
 }
 
 .stat-card {
   background: var(--card);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-md);
   border-radius: var(--radius);
-  padding: 20px;
+  padding: 18px;
   position: relative;
   overflow: hidden;
 }
@@ -225,76 +246,89 @@ body {
   position: absolute;
   top: 0; left: 0; right: 0;
   height: 3px;
+  border-radius: 14px 14px 0 0;
 }
 
-.stat-card.violet::after { background: var(--violet); }
-.stat-card.gold::after   { background: var(--gold); }
-.stat-card.green::after  { background: var(--green); }
-.stat-card.blue::after   { background: var(--blue); }
+.stat-card.rose::after   { background: var(--rose); }
+.stat-card.lilac::after  { background: var(--lilac); }
+.stat-card.sage::after   { background: var(--sage); }
+.stat-card.amber::after  { background: var(--amber); }
 
 .stat-value {
-  font-size: 32px;
-  font-weight: 900;
-  color: var(--text);
+  font-family: 'Playfair Display', serif;
+  font-size: 30px;
+  font-weight: 700;
   line-height: 1;
 }
 
-.stat-card.violet .stat-value { color: var(--violet-lt); }
-.stat-card.gold .stat-value   { color: var(--gold-lt); }
-.stat-card.green .stat-value  { color: var(--green); }
-.stat-card.blue .stat-value   { color: var(--blue); }
+.stat-card.rose  .stat-value { color: var(--rose); }
+.stat-card.lilac .stat-value { color: var(--lilac-dk); }
+.stat-card.sage  .stat-value { color: var(--sage-dk); }
+.stat-card.amber .stat-value { color: var(--amber); }
 
-.stat-name { font-size: 12px; color: var(--muted); margin-top: 6px; }
+.stat-name { font-size: 11px; color: var(--muted); margin-top: 5px; }
 
-/* PROJECTS GRID */
+/* ── PROJECTS GRID ── */
 .projects-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 18px;
 }
 
 .project-card {
   background: var(--card);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-md);
   border-radius: var(--radius);
-  padding: 24px;
+  padding: 22px;
   cursor: pointer;
   transition: all 0.2s;
   position: relative;
   overflow: hidden;
 }
 
+.project-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  border-radius: 14px 14px 0 0;
+}
+
+.project-card.color-rose::before   { background: linear-gradient(90deg, var(--rose), #f4b8d4); }
+.project-card.color-lilac::before  { background: linear-gradient(90deg, var(--lilac), #d4b8f0); }
+.project-card.color-sage::before   { background: linear-gradient(90deg, var(--sage), #c0e0b8); }
+.project-card.color-amber::before  { background: linear-gradient(90deg, var(--amber), #f8d090); }
+
 .project-card:hover {
-  border-color: rgba(124,58,237,0.4);
+  border-color: rgba(200,130,175,0.45);
   transform: translateY(-3px);
-  box-shadow: 0 12px 32px rgba(0,0,0,0.3);
+  box-shadow: 0 10px 28px rgba(200,130,175,0.15);
 }
 
 .project-card-top {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 }
 
 .project-tag {
   font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  padding: 4px 10px;
+  font-weight: 500;
+  padding: 3px 10px;
   border-radius: 20px;
+  letter-spacing: 0.3px;
 }
 
-.tag-andamento  { background: rgba(59,130,246,0.15); color: var(--blue); }
-.tag-concluido  { background: rgba(16,185,129,0.15); color: var(--green); }
-.tag-planejando { background: rgba(245,158,11,0.15); color: var(--gold); }
-.tag-pausado    { background: rgba(107,107,138,0.15); color: var(--muted); }
+.tag-andamento { background: #fce8f3; color: var(--rose-dk); }
+.tag-concluido { background: #eaf3e8; color: var(--sage-dk); }
+.tag-planejando { background: #fdf5e0; color: #c07820; }
+.tag-pausado   { background: #f0eaf8; color: var(--lilac-dk); }
 
 /* PROGRESS CIRCLE */
 .progress-circle {
   position: relative;
-  width: 52px; height: 52px;
+  width: 50px; height: 50px;
   flex-shrink: 0;
 }
 
@@ -302,7 +336,7 @@ body {
 
 .progress-circle .track {
   fill: none;
-  stroke: var(--bg3);
+  stroke: #f3e8f8;
   stroke-width: 4;
 }
 
@@ -317,47 +351,37 @@ body {
   position: absolute;
   inset: 0;
   display: flex; align-items: center; justify-content: center;
-  font-size: 11px;
-  font-weight: 800;
-  color: var(--white);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--muted);
 }
 
 .project-name {
-  font-size: 16px;
-  font-weight: 700;
+  font-family: 'Playfair Display', serif;
+  font-size: 15px;
+  font-weight: 600;
   color: var(--text);
-  margin-bottom: 8px;
-  line-height: 1.3;
+  margin-bottom: 7px;
+  line-height: 1.35;
 }
 
 .project-desc {
   font-size: 12px;
   color: var(--muted);
-  line-height: 1.6;
-  margin-bottom: 16px;
-}
-
-.project-meta {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 11px;
-  color: var(--muted);
-}
-
-.project-prazo {
-  display: flex; align-items: center; gap: 5px;
+  line-height: 1.65;
+  margin-bottom: 14px;
 }
 
 .project-notas {
-  background: #FFFBEB;
-  border-left: 3px solid var(--gold);
+  background: #fdf0f7;
+  border-left: 2px solid var(--rose);
   border-radius: 0 8px 8px 0;
-  padding: 10px 12px;
-  font-size: 12px;
-  color: #92400E;
+  padding: 9px 12px;
+  font-size: 11px;
+  color: #7a3d6b;
   line-height: 1.6;
   margin-bottom: 12px;
+  font-style: italic;
 }
 
 .project-dates {
@@ -372,74 +396,92 @@ body {
 .status-select {
   border: none;
   border-radius: 20px;
-  font-size: 11px;
-  font-weight: 700;
-  padding: 4px 10px;
+  font-size: 10px;
+  font-weight: 500;
+  padding: 3px 10px;
   cursor: pointer;
-  font-family: 'Inter', sans-serif;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  font-family: 'DM Sans', sans-serif;
   appearance: none;
   -webkit-appearance: none;
 }
 
-.status-select.tag-andamento  { background: rgba(59,130,246,0.15); color: var(--blue); }
-.status-select.tag-concluido  { background: rgba(16,185,129,0.15); color: var(--green); }
-.status-select.tag-planejando { background: rgba(245,158,11,0.15); color: #D97706; }
-.status-select.tag-pausado    { background: rgba(107,107,138,0.15); color: var(--muted); }
+.status-select.tag-andamento { background: #fce8f3; color: var(--rose-dk); }
+.status-select.tag-concluido { background: #eaf3e8; color: var(--sage-dk); }
+.status-select.tag-planejando { background: #fdf5e0; color: #c07820; }
+.status-select.tag-pausado   { background: #f0eaf8; color: var(--lilac-dk); }
 
 .project-next {
   background: var(--bg3);
   border-radius: 8px;
-  padding: 10px 12px;
+  padding: 9px 12px;
   font-size: 11px;
   color: var(--text);
-  margin-bottom: 16px;
+  margin-bottom: 14px;
   display: flex; align-items: flex-start; gap: 8px;
-  line-height: 1.5;
+  line-height: 1.55;
 }
 
-/* PDI PAGE */
+.project-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.project-prazo { display: flex; align-items: center; gap: 5px; }
+
+/* ── PDI ── */
 .pdi-layout {
   display: grid;
-  grid-template-columns: 1fr 340px;
-  gap: 24px;
+  grid-template-columns: 1fr 320px;
+  gap: 22px;
   align-items: start;
 }
 
-.pdi-timeline { display: flex; flex-direction: column; gap: 20px; }
+.pdi-timeline { display: flex; flex-direction: column; gap: 18px; }
 
 .pdi-block {
   background: var(--card);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-md);
   border-radius: var(--radius);
-  padding: 28px;
+  padding: 26px;
   position: relative;
+}
+
+.pdi-block::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  border-radius: 14px 14px 0 0;
+  background: linear-gradient(90deg, var(--rose), var(--lilac));
 }
 
 .pdi-block-header {
   display: flex;
   align-items: center;
   gap: 14px;
-  margin-bottom: 20px;
+  margin-bottom: 18px;
 }
 
 .pdi-block-icon {
-  width: 44px; height: 44px;
-  border-radius: 12px;
+  width: 42px; height: 42px;
+  border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
-  font-size: 20px;
+  font-size: 18px;
   flex-shrink: 0;
 }
 
-.icon-onde-estou    { background: rgba(59,130,246,0.15); }
-.icon-onde-vou      { background: rgba(124,58,237,0.15); }
-.icon-como-vou      { background: rgba(245,158,11,0.15); }
-.icon-resultados    { background: rgba(16,185,129,0.15); }
+.icon-onde-estou  { background: #fce8f3; }
+.icon-onde-vou    { background: #f0eaf8; }
+.icon-como-vou    { background: #fdf5e0; }
+.icon-resultados  { background: #eaf3e8; }
 
 .pdi-block-title {
-  font-size: 16px;
-  font-weight: 700;
+  font-family: 'Playfair Display', serif;
+  font-size: 15px;
+  font-weight: 600;
   color: var(--text);
 }
 
@@ -451,109 +493,100 @@ body {
 
 .pdi-textarea {
   width: 100%;
-  background: var(--bg3);
-  border: 1px solid var(--border);
+  background: var(--bg);
+  border: 1px solid var(--border-md);
   border-radius: 10px;
   color: var(--text);
-  font-family: 'Inter', sans-serif;
+  font-family: 'DM Sans', sans-serif;
   font-size: 13px;
   line-height: 1.7;
-  padding: 14px 16px;
+  padding: 13px 15px;
   resize: vertical;
   min-height: 90px;
   transition: border-color 0.2s;
 }
 
-.pdi-textarea:focus { outline: none; border-color: var(--violet); }
+.pdi-textarea:focus { outline: none; border-color: var(--rose); }
 .pdi-textarea::placeholder { color: var(--muted); }
 
-/* ACOES PDI */
-.acoes-list { display: flex; flex-direction: column; gap: 10px; }
+.acoes-list { display: flex; flex-direction: column; gap: 9px; }
 
 .acao-item {
   display: flex;
   align-items: center;
   gap: 12px;
-  background: var(--bg3);
+  background: var(--bg);
   border-radius: 10px;
-  padding: 12px 14px;
+  padding: 11px 13px;
+  border: 1px solid var(--border);
 }
 
 .acao-check {
   width: 20px; height: 20px;
-  border-radius: 6px;
-  border: 2px solid var(--border);
+  border-radius: 50%;
+  border: 1.5px solid var(--border-md);
   cursor: pointer;
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
   transition: all 0.2s;
+  font-size: 11px;
 }
 
-.acao-check.done { background: var(--green); border-color: var(--green); }
+.acao-check.done { background: var(--sage); border-color: var(--sage); color: white; }
 
-.acao-text {
-  flex: 1;
-  font-size: 13px;
-  color: var(--text);
-}
+.acao-text { flex: 1; font-size: 13px; color: var(--text); }
 .acao-text.done { text-decoration: line-through; color: var(--muted); }
 
-.acao-prazo {
-  font-size: 11px;
-  color: var(--muted);
-  white-space: nowrap;
-}
+.acao-prazo { font-size: 11px; color: var(--muted); white-space: nowrap; }
 
 .btn-add-acao {
   display: flex; align-items: center; gap: 8px;
   background: none;
-  border: 1px dashed var(--border);
+  border: 1px dashed var(--border-md);
   border-radius: 10px;
-  padding: 10px 14px;
+  padding: 9px 13px;
   color: var(--muted);
   font-size: 12px;
   cursor: pointer;
-  font-family: 'Inter', sans-serif;
+  font-family: 'DM Sans', sans-serif;
   width: 100%;
   transition: all 0.2s;
   margin-top: 8px;
 }
 
-.btn-add-acao:hover { border-color: var(--violet); color: var(--violet-lt); }
+.btn-add-acao:hover { border-color: var(--rose); color: var(--rose-dk); }
 
 /* PDI SIDEBAR */
-.pdi-sidebar { display: flex; flex-direction: column; gap: 16px; }
+.pdi-sidebar { display: flex; flex-direction: column; gap: 14px; }
 
 .pdi-side-card {
   background: var(--card);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-md);
   border-radius: var(--radius);
-  padding: 22px;
+  padding: 20px;
 }
 
 .pdi-side-title {
-  font-size: 13px;
-  font-weight: 700;
+  font-family: 'Playfair Display', serif;
+  font-size: 14px;
+  font-weight: 600;
   color: var(--text);
-  margin-bottom: 16px;
+  margin-bottom: 14px;
   display: flex; align-items: center; gap: 8px;
 }
 
-/* COMPETENCIAS */
-.competencia-item {
-  margin-bottom: 14px;
-}
+.competencia-item { margin-bottom: 13px; }
 
 .comp-header {
   display: flex; justify-content: space-between;
-  font-size: 12px; margin-bottom: 6px;
+  font-size: 12px; margin-bottom: 5px;
 }
 
-.comp-name { color: var(--text); font-weight: 500; }
+.comp-name { color: var(--text); font-weight: 400; }
 .comp-pct  { color: var(--muted); }
 
 .comp-bar {
-  height: 6px;
+  height: 5px;
   background: var(--bg3);
   border-radius: 3px;
   overflow: hidden;
@@ -565,113 +598,112 @@ body {
   transition: width 1s ease;
 }
 
-/* CICLO */
-.ciclo-info {
-  display: flex; flex-direction: column; gap: 10px;
-}
+.ciclo-info { display: flex; flex-direction: column; gap: 9px; }
 
 .ciclo-row {
   display: flex; justify-content: space-between; align-items: center;
 }
 
 .ciclo-label { font-size: 12px; color: var(--muted); }
-.ciclo-value { font-size: 12px; font-weight: 600; color: var(--text); }
+.ciclo-value { font-size: 12px; font-weight: 500; color: var(--text); }
+
 .ciclo-progress {
-  margin-top: 8px;
-  height: 8px;
+  margin-top: 4px;
+  height: 6px;
   background: var(--bg3);
-  border-radius: 4px;
+  border-radius: 3px;
   overflow: hidden;
 }
 
 .ciclo-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--violet), var(--gold));
-  border-radius: 4px;
+  background: linear-gradient(90deg, var(--rose), var(--lilac));
+  border-radius: 3px;
   width: 45%;
 }
 
-/* MODAL */
+/* ── MODAL ── */
 .modal-overlay {
   display: none; position: fixed; inset: 0;
-  background: rgba(0,0,0,0.8); z-index: 200;
+  background: rgba(58,31,53,0.55);
+  z-index: 200;
   align-items: center; justify-content: center;
-  padding: 20px; backdrop-filter: blur(6px);
+  padding: 20px;
+  backdrop-filter: blur(4px);
 }
 
 .modal-overlay.open { display: flex; }
 
 .modal {
-  background: var(--white);
-  border: 1px solid var(--border);
+  background: var(--bg2);
+  border: 1px solid var(--border-md);
   border-radius: 20px;
-  padding: 32px;
-  width: 100%; max-width: 500px;
-  animation: modalIn 0.3s ease;
+  padding: 30px;
+  width: 100%; max-width: 480px;
+  animation: modalIn 0.25s ease;
   max-height: 90vh; overflow-y: auto;
 }
 
 @keyframes modalIn {
-  from { opacity: 0; transform: scale(0.95) translateY(16px); }
+  from { opacity: 0; transform: scale(0.96) translateY(12px); }
   to   { opacity: 1; transform: scale(1) translateY(0); }
 }
 
 .modal-title {
   font-family: 'Playfair Display', serif;
-  font-size: 22px; font-weight: 900;
-  color: var(--text); margin-bottom: 6px;
+  font-size: 22px; font-weight: 700;
+  color: var(--text); margin-bottom: 5px;
 }
 
-.modal-sub { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
+.modal-sub { font-size: 13px; color: var(--muted); margin-bottom: 22px; font-style: italic; }
 
-.form-group { margin-bottom: 18px; }
+.form-group { margin-bottom: 16px; }
 
 .form-label {
-  display: block; font-size: 11px; font-weight: 700;
+  display: block; font-size: 11px; font-weight: 500;
   text-transform: uppercase; letter-spacing: 1px;
-  color: var(--muted); margin-bottom: 8px;
+  color: var(--muted); margin-bottom: 7px;
 }
 
 .form-input, .form-textarea, .form-select {
-  width: 100%; padding: 11px 14px;
-  background: var(--bg3);
-  border: 1px solid var(--border);
+  width: 100%; padding: 10px 13px;
+  background: var(--bg);
+  border: 1px solid var(--border-md);
   border-radius: 10px;
   color: var(--text);
-  font-size: 13px; font-family: 'Inter', sans-serif;
+  font-size: 13px; font-family: 'DM Sans', sans-serif;
   transition: border-color 0.2s;
 }
 
 .form-input:focus, .form-textarea:focus, .form-select:focus {
-  outline: none; border-color: var(--violet);
+  outline: none; border-color: var(--rose);
 }
 
-.form-select option { background: var(--white); }
+.form-select option { background: var(--bg2); }
 .form-textarea { resize: vertical; min-height: 80px; line-height: 1.6; }
 
-.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
-.modal-actions { display: flex; gap: 10px; margin-top: 24px; }
+.modal-actions { display: flex; gap: 10px; margin-top: 22px; }
 
 .btn-cancel {
-  flex: 1; padding: 12px;
-  border: 1px solid var(--border);
-  border-radius: 10px; background: var(--bg3);
-  color: var(--muted); font-size: 13px; font-weight: 600;
-  cursor: pointer; font-family: 'Inter', sans-serif;
+  flex: 1; padding: 11px;
+  border: 1px solid var(--border-md);
+  border-radius: 20px; background: var(--bg);
+  color: var(--muted); font-size: 13px; font-weight: 500;
+  cursor: pointer; font-family: 'DM Sans', sans-serif;
   transition: all 0.2s;
 }
 
-.btn-cancel:hover { border-color: var(--muted); color: var(--text); }
+.btn-cancel:hover { border-color: var(--rose); color: var(--rose-dk); }
 
-/* TOAST */
+/* ── TOAST ── */
 .toast {
-  position: fixed; bottom: 28px; right: 28px;
-  background: var(--text); color: var(--white);
-  padding: 14px 20px; border-radius: 12px;
-  font-size: 13px; font-weight: 600;
-  border-left: 3px solid var(--violet);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  position: fixed; bottom: 24px; right: 24px;
+  background: var(--text); color: white;
+  padding: 13px 18px; border-radius: 12px;
+  font-size: 13px; font-weight: 500;
+  border-left: 3px solid var(--rose);
   z-index: 300;
   transform: translateY(80px); opacity: 0;
   transition: all 0.3s;
@@ -680,10 +712,10 @@ body {
 
 .toast.show { transform: translateY(0); opacity: 1; }
 
-/* SCROLLBAR */
-::-webkit-scrollbar { width: 6px; }
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #D0D0E0; border-radius: 3px; }
+::-webkit-scrollbar-thumb { background: #e8c8dc; border-radius: 3px; }
 </style>
 </head>
 <body>
@@ -691,24 +723,21 @@ body {
 <!-- SIDEBAR -->
 <aside class="sidebar">
   <div class="sidebar-brand">
-    <div class="brand-icon">🗂️</div>
+    <div class="brand-icon">🌸</div>
     <div class="brand-name">Planner da Dali</div>
     <div class="brand-sub">Organização & Desenvolvimento</div>
   </div>
-
   <nav class="sidebar-nav">
     <div class="nav-label">Visão Geral</div>
     <button class="nav-item active" onclick="navegar('projetos', this)">
       <span class="nav-icon">📋</span> Projetos
       <span class="nav-badge" id="badge-projetos">3</span>
     </button>
-
     <div class="nav-label">Desenvolvimento</div>
     <button class="nav-item" onclick="navegar('pdi', this)">
       <span class="nav-icon">🌱</span> Meu PDI
     </button>
   </nav>
-
   <div class="sidebar-footer">
     <div class="user-card">
       <div class="user-avatar">EU</div>
@@ -728,25 +757,25 @@ body {
     <div class="page-header">
       <div>
         <div class="page-title">Meus Projetos</div>
-        <div class="page-subtitle">Acompanhe tudo que você está construindo</div>
+        <div class="page-subtitle">Acompanhe tudo que você está construindo ✨</div>
       </div>
       <button class="btn-primary" onclick="abrirModalProjeto()">+ Novo Projeto</button>
     </div>
 
     <div class="stats-row">
-      <div class="stat-card violet">
+      <div class="stat-card rose">
         <div class="stat-value" id="stat-total">3</div>
         <div class="stat-name">Total de projetos</div>
       </div>
-      <div class="stat-card blue">
+      <div class="stat-card lilac">
         <div class="stat-value" id="stat-andamento">2</div>
         <div class="stat-name">Em andamento</div>
       </div>
-      <div class="stat-card green">
+      <div class="stat-card sage">
         <div class="stat-value" id="stat-concluido">0</div>
         <div class="stat-name">Concluídos</div>
       </div>
-      <div class="stat-card gold">
+      <div class="stat-card amber">
         <div class="stat-value" id="stat-planejando">1</div>
         <div class="stat-name">Planejando</div>
       </div>
@@ -768,7 +797,6 @@ body {
     <div class="pdi-layout">
       <div class="pdi-timeline">
 
-        <!-- Onde estou -->
         <div class="pdi-block">
           <div class="pdi-block-header">
             <div class="pdi-block-icon icon-onde-estou">📍</div>
@@ -780,7 +808,6 @@ body {
           <textarea class="pdi-textarea" id="pdi-onde-estou" placeholder="Descreva seu momento atual na empresa, suas principais forças e os pontos que você quer trabalhar...">Sou roteirizadora de Last Mile, recém chegada no time. Tenho facilidade com análise de dados e aprendo rápido com novas ferramentas. Estou desenvolvendo meu conhecimento em automações e IA aplicada ao trabalho.</textarea>
         </div>
 
-        <!-- Onde quero chegar -->
         <div class="pdi-block">
           <div class="pdi-block-header">
             <div class="pdi-block-icon icon-onde-vou">🎯</div>
@@ -792,7 +819,6 @@ body {
           <textarea class="pdi-textarea" id="pdi-onde-vou" placeholder="Qual é o seu objetivo para este ciclo? Que perfil ou posição você almeja?">Quero me tornar referência em inovação dentro do time de roteirização, sendo capaz de propor e implementar melhorias de processo usando tecnologia. A meta é liderar pelo menos dois projetos de automação até o fim do ciclo.</textarea>
         </div>
 
-        <!-- Como vou chegar -->
         <div class="pdi-block">
           <div class="pdi-block-header">
             <div class="pdi-block-icon icon-como-vou">🛤️</div>
@@ -821,7 +847,6 @@ body {
           <button class="btn-add-acao" onclick="adicionarAcao()">+ Adicionar ação</button>
         </div>
 
-        <!-- Resultados -->
         <div class="pdi-block">
           <div class="pdi-block-header">
             <div class="pdi-block-icon icon-resultados">🏆</div>
@@ -837,7 +862,6 @@ body {
 
       <!-- PDI SIDEBAR -->
       <div class="pdi-sidebar">
-
         <div class="pdi-side-card">
           <div class="pdi-side-title">📅 Ciclo Atual</div>
           <div class="ciclo-info">
@@ -868,7 +892,7 @@ body {
                 <span class="comp-pct">65%</span>
               </div>
               <div class="comp-bar">
-                <div class="comp-fill" style="width:65%;background:var(--violet)"></div>
+                <div class="comp-fill" style="width:65%;background:var(--rose)"></div>
               </div>
             </div>
             <div class="competencia-item">
@@ -877,7 +901,7 @@ body {
                 <span class="comp-pct">80%</span>
               </div>
               <div class="comp-bar">
-                <div class="comp-fill" style="width:80%;background:var(--blue)"></div>
+                <div class="comp-fill" style="width:80%;background:var(--lilac)"></div>
               </div>
             </div>
             <div class="competencia-item">
@@ -886,7 +910,7 @@ body {
                 <span class="comp-pct">50%</span>
               </div>
               <div class="comp-bar">
-                <div class="comp-fill" style="width:50%;background:var(--gold)"></div>
+                <div class="comp-fill" style="width:50%;background:var(--amber)"></div>
               </div>
             </div>
             <div class="competencia-item">
@@ -895,24 +919,22 @@ body {
                 <span class="comp-pct">70%</span>
               </div>
               <div class="comp-bar">
-                <div class="comp-fill" style="width:70%;background:var(--green)"></div>
+                <div class="comp-fill" style="width:70%;background:var(--sage)"></div>
               </div>
             </div>
           </div>
         </div>
-
       </div>
     </div>
   </div>
 
 </main>
 
-<!-- MODAL PROJETO -->
+<!-- MODAL NOVO PROJETO -->
 <div class="modal-overlay" id="modal-projeto">
   <div class="modal">
-    <div class="modal-title">Novo Projeto</div>
+    <div class="modal-title">Novo Projeto 🌸</div>
     <div class="modal-sub">Adicione um projeto ao seu planner</div>
-
     <div class="form-group">
       <label class="form-label">Nome do projeto</label>
       <input class="form-input" id="proj-nome" placeholder="Ex: Automação de OEs">
@@ -954,7 +976,6 @@ body {
       <label class="form-label">Progresso (%)</label>
       <input class="form-input" id="proj-progresso" type="number" min="0" max="100" placeholder="0">
     </div>
-
     <div class="modal-actions">
       <button class="btn-cancel" onclick="fecharModal()">Cancelar</button>
       <button class="btn-primary" onclick="salvarProjeto()" style="flex:2;justify-content:center">Adicionar projeto</button>
@@ -965,11 +986,9 @@ body {
 <!-- MODAL EDITAR PROJETO -->
 <div class="modal-overlay" id="modal-editar">
   <div class="modal">
-    <div class="modal-title">✏️ Editar Projeto</div>
+    <div class="modal-title">Editar Projeto ✏️</div>
     <div class="modal-sub">Atualize as informações do projeto</div>
-
     <input type="hidden" id="edit-id">
-
     <div class="form-group">
       <label class="form-label">Nome do projeto</label>
       <input class="form-input" id="edit-nome" placeholder="Ex: Automação de OEs">
@@ -1011,292 +1030,245 @@ body {
       <label class="form-label">Progresso (%)</label>
       <input class="form-input" id="edit-progresso" type="number" min="0" max="100" placeholder="0">
     </div>
-    <div class="form-group">
-      <label class="form-label">Andamento / Anotações</label>
-      <textarea class="form-textarea" id="edit-notas" placeholder="Escreva aqui o andamento do projeto com suas próprias palavras..."></textarea>
-    </div>
-
     <div class="modal-actions">
       <button class="btn-cancel" onclick="fecharModalEditar()">Cancelar</button>
-      <button class="btn-primary" onclick="salvarEdicao()" style="flex:2;justify-content:center">💾 Salvar alterações</button>
+      <button class="btn-primary" onclick="salvarEdicao()" style="flex:2;justify-content:center">Salvar alterações</button>
     </div>
   </div>
 </div>
 
 <!-- TOAST -->
-<div class="toast" id="toast">
-  <span id="toast-icon">✨</span>
-  <span id="toast-msg">Salvo!</span>
-</div>
+<div class="toast" id="toast">🌸 <span id="toast-msg"></span></div>
 
 <script>
-const STATUS_LABEL = {
-  andamento:  "Em andamento",
-  concluido:  "Concluído",
-  planejando: "Planejando",
-  pausado:    "Pausado",
-};
-
-const STATUS_TAG = {
-  andamento:  "tag-andamento",
-  concluido:  "tag-concluido",
-  planejando: "tag-planejando",
-  pausado:    "tag-pausado",
-};
-
-const CIRCLE_COLORS = {
-  andamento:  "#3B82F6",
-  concluido:  "#10B981",
-  planejando: "#F59E0B",
-  pausado:    "#6B6B8A",
-};
+const CARD_COLORS = ['color-rose','color-lilac','color-sage','color-amber'];
 
 let projetos = [
   {
-    id: 1, nome: "Automação de Aprovação de OEs",
-    desc: "Script Google Apps Script para notificar analistas via e-mail e atualizar o Status Routing automaticamente na planilha.",
-    status: "andamento", prazo: "2025-07", progresso: 60, inicio: "2025-06-22", conclusao: "",
-    next: "Aguardar aprovação da gestão para implementar na planilha de produção",
-    notas: ""
+    id: 1, nome: 'Automação de Aprovação de OEs',
+    desc: 'Script Google Apps Script para notificar analistas via e-mail e atualizar o Status Routing automaticamente na planilha.',
+    status: 'andamento', prazo: '2025-07', inicio: '2025-06-22', conclusao: '',
+    next: 'Aguardar aprovação da gestão para implementar na planilha de produção',
+    progresso: 40, color: 0
   },
   {
-    id: 2, nome: "Mural de Reconhecimento",
-    desc: "App web com os pilares do DNA Meli para reconhecimento horizontal do time, integrado ao Google Sheets e Google Chat.",
-    status: "andamento", prazo: "2025-07", progresso: 35, inicio: "2025-06-22", conclusao: "",
-    next: "Conseguir acesso ao repositório GitHub com a colega do time",
-    notas: ""
+    id: 2, nome: 'Mural de Reconhecimento',
+    desc: 'App web com os pilares do DNA Meli para reconhecimento horizontal do time, integrado ao Google Sheets e Google Chat.',
+    status: 'andamento', prazo: '2025-07', inicio: '2025-06-22', conclusao: '',
+    next: 'Conseguir acesso ao repositório GitHub com a colega do time',
+    progresso: 25, color: 1
   },
   {
-    id: 3, nome: "Planner Pessoal & PDI",
-    desc: "Ferramenta de organização pessoal para acompanhar projetos e desenvolvimento profissional de forma visual.",
-    status: "planejando", prazo: "2025-08", progresso: 15, inicio: "2025-06-22", conclusao: "",
-    next: "Definir onde hospedar e como persistir os dados",
-    notas: ""
-  },
+    id: 3, nome: 'Novo projeto em construção',
+    desc: 'Em planejamento.',
+    status: 'planejando', prazo: '', inicio: '', conclusao: '',
+    next: '', progresso: 0, color: 2
+  }
 ];
 
-function navegar(pagina, el) {
-  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
-  document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
-  document.getElementById("page-" + pagina).classList.add("active");
-  el.classList.add("active");
+let nextId = 4;
+
+function getStatusLabel(s) {
+  const map = { andamento:'Em andamento', concluido:'Concluído', planejando:'Planejando', pausado:'Pausado' };
+  return map[s] || s;
 }
 
-function circulo(pct, cor) {
-  const r = 20, circ = 2 * Math.PI * r;
-  const offset = circ - (pct / 100) * circ;
-  return `
-    <svg width="52" height="52" viewBox="0 0 52 52">
-      <circle class="track" cx="26" cy="26" r="${r}"/>
-      <circle class="fill" cx="26" cy="26" r="${r}"
-        stroke="${cor}"
-        stroke-dasharray="${circ}"
-        stroke-dashoffset="${offset}"/>
+function formatPrazo(prazo) {
+  if (!prazo) return '';
+  const [y,m] = prazo.split('-');
+  const meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  return meses[parseInt(m)-1] + '/' + y.slice(2);
+}
+
+function formatDate(d) {
+  if (!d) return '—';
+  const [y,m,day] = d.split('-');
+  return `${day}/${m}/${y}`;
+}
+
+function progressColor(s) {
+  if (s === 'concluido') return '#8ebc88';
+  if (s === 'andamento') return '#e091b8';
+  if (s === 'planejando') return '#e8a84a';
+  return '#b08ed4';
+}
+
+function renderProgress(pct, status) {
+  const r = 20, c = 2 * Math.PI * r;
+  const offset = c - (pct / 100) * c;
+  const col = progressColor(status);
+  return `<div class="progress-circle">
+    <svg width="50" height="50" viewBox="0 0 50 50">
+      <circle class="track" cx="25" cy="25" r="${r}"/>
+      <circle class="fill" cx="25" cy="25" r="${r}"
+        stroke="${col}" stroke-dasharray="${c}" stroke-dashoffset="${offset}"/>
     </svg>
     <div class="pct">${pct}%</div>
-  `;
+  </div>`;
 }
 
-function renderProjetos() {
-  const grid = document.getElementById("projects-grid");
-  if (projetos.length === 0) {
-    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:80px 0;color:var(--muted)">
-      <div style="font-size:40px;margin-bottom:16px">📂</div>
-      <p>Nenhum projeto ainda. Que tal criar o primeiro?</p>
-    </div>`;
-    return;
-  }
-
-  grid.innerHTML = projetos.map(p => `
-    <div class="project-card">
+function renderProjects() {
+  const grid = document.getElementById('projects-grid');
+  grid.innerHTML = projetos.map(p => {
+    const colorClass = CARD_COLORS[p.color % CARD_COLORS.length];
+    return `<div class="project-card ${colorClass}">
       <div class="project-card-top">
-        <select class="status-select ${STATUS_TAG[p.status]}" onchange="mudarStatus(${p.id}, this.value)">
-          <option value="planejando" ${p.status==="planejando"?"selected":""}>📋 Planejando</option>
-          <option value="andamento"  ${p.status==="andamento"?"selected":""}>🔄 Em andamento</option>
-          <option value="pausado"    ${p.status==="pausado"?"selected":""}>⏸️ Pausado</option>
-          <option value="concluido"  ${p.status==="concluido"?"selected":""}>✅ Concluído</option>
+        <select class="status-select tag-${p.status}" onchange="mudarStatus(${p.id}, this.value)" onclick="event.stopPropagation()">
+          <option value="planejando" ${p.status==='planejando'?'selected':''}>Planejando</option>
+          <option value="andamento"  ${p.status==='andamento'?'selected':''}>Em andamento</option>
+          <option value="concluido"  ${p.status==='concluido'?'selected':''}>Concluído</option>
+          <option value="pausado"    ${p.status==='pausado'?'selected':''}>Pausado</option>
         </select>
-        <div class="progress-circle">${circulo(p.progresso, CIRCLE_COLORS[p.status])}</div>
+        ${renderProgress(p.progresso || 0, p.status)}
       </div>
       <div class="project-name">${p.nome}</div>
       <div class="project-desc">${p.desc}</div>
-      ${p.next ? `<div class="project-next">→ <span>${p.next}</span></div>` : ""}
-      ${p.notas ? `<div class="project-notas">📝 ${p.notas}</div>` : ""}
+      ${p.next ? `<div class="project-notas">→ ${p.next}</div>` : ''}
       <div class="project-dates">
-        <span>🗓️ Início: ${p.inicio ? formatarData(p.inicio) : "—"}</span>
-        <span>🏁 Conclusão: ${p.conclusao ? formatarData(p.conclusao) : "—"}</span>
+        <span>🗓 Início: ${formatDate(p.inicio)}</span>
+        <span>🏁 Conclusão: ${formatDate(p.conclusao)}</span>
       </div>
-      <div class="project-meta">
-        <span class="project-prazo">📅 ${p.prazo ? formatarMes(p.prazo) : "Sem prazo"}</span>
-        <div style="display:flex;gap:10px;align-items:center;">
-          <span style="font-size:12px;color:var(--violet);cursor:pointer;font-weight:600;" onclick="editarProjeto(${p.id})">✏️ Editar</span>
-          <span style="font-size:11px;color:var(--muted);cursor:pointer" onclick="removerProjeto(${p.id})">🗑</span>
-        </div>
+      ${p.prazo ? `<div class="project-meta"><div class="project-prazo">📌 ${formatPrazo(p.prazo)}</div></div>` : ''}
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding-top:10px;border-top:1px solid rgba(200,130,175,0.15)">
+        <span style="font-size:11px;color:var(--rose-dk);cursor:pointer;font-weight:500" onclick="abrirModalEditar(${p.id})">✏️ Editar</span>
+        <span style="font-size:18px;cursor:pointer;opacity:0.35" onclick="deletarProjeto(${p.id})">🗑</span>
       </div>
-    </div>
-  `).join("");
+    </div>`;
+  }).join('');
 
   atualizarStats();
 }
 
-function formatarMes(ym) {
-  const [y, m] = ym.split("-");
-  const meses = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
-  return `${meses[parseInt(m)-1]}/${y.slice(2)}`;
+function atualizarStats() {
+  document.getElementById('stat-total').textContent     = projetos.length;
+  document.getElementById('stat-andamento').textContent = projetos.filter(p => p.status === 'andamento').length;
+  document.getElementById('stat-concluido').textContent = projetos.filter(p => p.status === 'concluido').length;
+  document.getElementById('stat-planejando').textContent= projetos.filter(p => p.status === 'planejando').length;
+  document.getElementById('badge-projetos').textContent  = projetos.length;
 }
 
-function atualizarStats() {
-  document.getElementById("stat-total").textContent = projetos.length;
-  document.getElementById("stat-andamento").textContent = projetos.filter(p => p.status === "andamento").length;
-  document.getElementById("stat-concluido").textContent = projetos.filter(p => p.status === "concluido").length;
-  document.getElementById("stat-planejando").textContent = projetos.filter(p => p.status === "planejando").length;
-  document.getElementById("badge-projetos").textContent = projetos.length;
+function mudarStatus(id, val) {
+  const p = projetos.find(x => x.id === id);
+  if (p) { p.status = val; renderProjects(); }
+}
+
+function deletarProjeto(id) {
+  projetos = projetos.filter(x => x.id !== id);
+  renderProjects();
+  mostrarToast('Projeto removido');
 }
 
 function abrirModalProjeto() {
-  document.getElementById("modal-projeto").classList.add("open");
+  document.getElementById('modal-projeto').classList.add('open');
 }
 
 function fecharModal() {
-  document.getElementById("modal-projeto").classList.remove("open");
-  ["proj-nome","proj-desc","proj-next","proj-progresso","proj-inicio","proj-conclusao"].forEach(id => document.getElementById(id).value = "");
-  document.getElementById("proj-status").value = "planejando";
-  document.getElementById("proj-prazo").value = "";
+  document.getElementById('modal-projeto').classList.remove('open');
+  ['proj-nome','proj-desc','proj-next','proj-prazo','proj-inicio','proj-conclusao','proj-progresso'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('proj-status').value = 'planejando';
 }
 
 function salvarProjeto() {
-  const nome = document.getElementById("proj-nome").value.trim();
-  const desc = document.getElementById("proj-desc").value.trim();
-  const status = document.getElementById("proj-status").value;
-  const prazo = document.getElementById("proj-prazo").value;
-  const next = document.getElementById("proj-next").value.trim();
-  const progresso = parseInt(document.getElementById("proj-progresso").value) || 0;
-
-  const inicio = document.getElementById("proj-inicio").value;
-  const conclusao = document.getElementById("proj-conclusao").value;
-
-  if (!nome) { toast("⚠️", "Dá um nome pro projeto primeiro!"); return; }
-
-  projetos.unshift({ id: Date.now(), nome, desc, status, prazo, progresso, inicio, conclusao, next, notas: "" });
+  const nome = document.getElementById('proj-nome').value.trim();
+  if (!nome) { alert('Dê um nome ao projeto 🌸'); return; }
+  projetos.push({
+    id: nextId++,
+    nome,
+    desc:       document.getElementById('proj-desc').value.trim(),
+    status:     document.getElementById('proj-status').value,
+    prazo:      document.getElementById('proj-prazo').value,
+    inicio:     document.getElementById('proj-inicio').value,
+    conclusao:  document.getElementById('proj-conclusao').value,
+    next:       document.getElementById('proj-next').value.trim(),
+    progresso:  parseInt(document.getElementById('proj-progresso').value) || 0,
+    color:      (projetos.length) % CARD_COLORS.length
+  });
   fecharModal();
-  renderProjetos();
-  toast("✨", `"${nome}" adicionado!`);
+  renderProjects();
+  mostrarToast('Projeto adicionado!');
 }
 
-function removerProjeto(id) {
-  projetos = projetos.filter(p => p.id !== id);
-  renderProjetos();
-  toast("🗑️", "Projeto removido.");
-}
-
-function editarProjeto(id) {
+function abrirModalEditar(id) {
   const p = projetos.find(x => x.id === id);
   if (!p) return;
-  document.getElementById("edit-id").value = p.id;
-  document.getElementById("edit-nome").value = p.nome;
-  document.getElementById("edit-desc").value = p.desc;
-  document.getElementById("edit-status").value = p.status;
-  document.getElementById("edit-prazo").value = p.prazo || "";
-  document.getElementById("edit-inicio").value = p.inicio || "";
-  document.getElementById("edit-conclusao").value = p.conclusao || "";
-  document.getElementById("edit-next").value = p.next || "";
-  document.getElementById("edit-progresso").value = p.progresso || 0;
-  document.getElementById("edit-notas").value = p.notas || "";
-  document.getElementById("modal-editar").classList.add("open");
+  document.getElementById('edit-id').value         = id;
+  document.getElementById('edit-nome').value       = p.nome;
+  document.getElementById('edit-desc').value       = p.desc;
+  document.getElementById('edit-status').value     = p.status;
+  document.getElementById('edit-prazo').value      = p.prazo || '';
+  document.getElementById('edit-inicio').value     = p.inicio || '';
+  document.getElementById('edit-conclusao').value  = p.conclusao || '';
+  document.getElementById('edit-next').value       = p.next || '';
+  document.getElementById('edit-progresso').value  = p.progresso || 0;
+  document.getElementById('modal-editar').classList.add('open');
 }
 
 function fecharModalEditar() {
-  document.getElementById("modal-editar").classList.remove("open");
+  document.getElementById('modal-editar').classList.remove('open');
 }
 
 function salvarEdicao() {
-  const id = parseInt(document.getElementById("edit-id").value);
-  const p = projetos.find(x => x.id === id);
+  const id = parseInt(document.getElementById('edit-id').value);
+  const p  = projetos.find(x => x.id === id);
   if (!p) return;
-
-  p.nome      = document.getElementById("edit-nome").value.trim();
-  p.desc      = document.getElementById("edit-desc").value.trim();
-  p.status    = document.getElementById("edit-status").value;
-  p.prazo     = document.getElementById("edit-prazo").value;
-  p.inicio    = document.getElementById("edit-inicio").value;
-  p.conclusao = document.getElementById("edit-conclusao").value;
-  p.next      = document.getElementById("edit-next").value.trim();
-  p.progresso = parseInt(document.getElementById("edit-progresso").value) || 0;
-  p.notas     = document.getElementById("edit-notas").value.trim();
-
+  p.nome      = document.getElementById('edit-nome').value.trim();
+  p.desc      = document.getElementById('edit-desc').value.trim();
+  p.status    = document.getElementById('edit-status').value;
+  p.prazo     = document.getElementById('edit-prazo').value;
+  p.inicio    = document.getElementById('edit-inicio').value;
+  p.conclusao = document.getElementById('edit-conclusao').value;
+  p.next      = document.getElementById('edit-next').value.trim();
+  p.progresso = parseInt(document.getElementById('edit-progresso').value) || 0;
   fecharModalEditar();
-  renderProjetos();
-  toast("💾", "Projeto atualizado!");
+  renderProjects();
+  mostrarToast('Projeto atualizado!');
 }
 
-function mudarStatus(id, novoStatus) {
-  const p = projetos.find(x => x.id === id);
-  if (!p) return;
-  p.status = novoStatus;
-  if (novoStatus === "concluido" && !p.conclusao) {
-    p.conclusao = new Date().toISOString().split("T")[0];
-  }
-  renderProjetos();
-  toast("🔄", "Status atualizado!");
-}
-
-function formatarData(d) {
-  if (!d) return "—";
-  const [y, m, dia] = d.split("-");
-  return dia + "/" + m + "/" + y;
+function navegar(pagina, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + pagina).classList.add('active');
+  btn.classList.add('active');
 }
 
 function toggleAcao(el) {
-  const done = el.classList.toggle("done");
-  el.textContent = done ? "✓" : "";
-  const texto = el.nextElementSibling;
-  texto.classList.toggle("done", done);
-  atualizarAcoesPDI();
-}
-
-function atualizarAcoesPDI() {
-  const checks = document.querySelectorAll(".acao-check");
-  const done = document.querySelectorAll(".acao-check.done").length;
-  document.getElementById("acoes-done-count").textContent = `${done} de ${checks.length}`;
+  el.classList.toggle('done');
+  el.textContent = el.classList.contains('done') ? '✓' : '';
+  const txt = el.nextElementSibling;
+  txt.classList.toggle('done');
+  const total = document.querySelectorAll('.acao-check').length;
+  const done  = document.querySelectorAll('.acao-check.done').length;
+  document.getElementById('acoes-done-count').textContent = `${done} de ${total}`;
 }
 
 function adicionarAcao() {
-  const texto = prompt("Qual é a ação?");
+  const texto = prompt('Qual é a ação?');
   if (!texto) return;
-  const prazo = prompt("Prazo (ex: Jul/25):") || "";
-  const list = document.getElementById("acoes-list");
-  const div = document.createElement("div");
-  div.className = "acao-item";
-  div.innerHTML = `
-    <div class="acao-check" onclick="toggleAcao(this)"></div>
+  const prazo = prompt('Prazo (ex: Ago/25):') || '';
+  const lista = document.getElementById('acoes-list');
+  const item  = document.createElement('div');
+  item.className = 'acao-item';
+  item.innerHTML = `<div class="acao-check" onclick="toggleAcao(this)"></div>
     <span class="acao-text">${texto}</span>
-    <span class="acao-prazo">${prazo}</span>
-  `;
-  list.appendChild(div);
-  atualizarAcoesPDI();
+    <span class="acao-prazo">${prazo}</span>`;
+  lista.appendChild(item);
+  const total = document.querySelectorAll('.acao-check').length;
+  const done  = document.querySelectorAll('.acao-check.done').length;
+  document.getElementById('acoes-done-count').textContent = `${done} de ${total}`;
 }
 
-function salvarPDI() {
-  toast("💾", "PDI salvo com sucesso!");
+function salvarPDI() { mostrarToast('PDI salvo com sucesso!'); }
+
+function mostrarToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
 }
 
-function toast(icon, msg) {
-  document.getElementById("toast-icon").textContent = icon;
-  document.getElementById("toast-msg").textContent = msg;
-  const t = document.getElementById("toast");
-  t.classList.add("show");
-  setTimeout(() => t.classList.remove("show"), 3000);
-}
-
-document.getElementById("modal-projeto").addEventListener("click", function(e) {
-  if (e.target === this) fecharModal();
-});
-
-document.getElementById("modal-editar").addEventListener("click", function(e) {
-  if (e.target === this) fecharModalEditar();
-});
-
-renderProjetos();
+renderProjects();
 </script>
 </body>
 </html>
