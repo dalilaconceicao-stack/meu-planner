@@ -162,12 +162,25 @@ body {
 }
 
 .user-avatar {
-  width: 32px; height: 32px;
+  width: 36px; height: 36px;
   border-radius: 50%;
   background: var(--rose-dk);
   display: flex; align-items: center; justify-content: center;
   font-size: 12px; font-weight: 600; color: white;
   flex-shrink: 0;
+  cursor: pointer;
+  overflow: hidden;
+  border: 2px solid var(--rose);
+  transition: all 0.2s;
+  position: relative;
+}
+
+.user-avatar:hover { border-color: var(--rose-dk); opacity: 0.85; }
+
+.user-avatar img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
 }
 
 .user-name { font-size: 12px; font-weight: 500; color: var(--text); }
@@ -779,7 +792,10 @@ body {
   </nav>
   <div class="sidebar-footer">
     <div class="user-card">
-      <div class="user-avatar">EU</div>
+      <div class="user-avatar" onclick="document.getElementById('input-foto').click()" title="Clique para trocar a foto">
+        <span id="avatar-iniciais">EU</span>
+        <input type="file" id="input-foto" accept="image/*" style="display:none" onchange="trocarFoto(event)">
+      </div>
       <div>
         <div class="user-name">Você</div>
         <div class="user-role">Roteirizadora · Last Mile</div>
@@ -1240,6 +1256,35 @@ function atualizarStats() {
   document.getElementById('badge-projetos').textContent  = projetos.length;
 }
 
+function trocarFoto(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const avatar = document.querySelector('.user-avatar');
+    document.getElementById('avatar-iniciais').style.display = 'none';
+    const img = document.getElementById('avatar-foto') || document.createElement('img');
+    img.id = 'avatar-foto';
+    img.src = e.target.result;
+    avatar.appendChild(img);
+    localStorage.setItem('planner_foto', e.target.result);
+    mostrarToast('📸 Foto atualizada!');
+  };
+  reader.readAsDataURL(file);
+}
+
+function carregarFoto() {
+  const foto = localStorage.getItem('planner_foto');
+  if (foto) {
+    const avatar = document.querySelector('.user-avatar');
+    document.getElementById('avatar-iniciais').style.display = 'none';
+    const img = document.createElement('img');
+    img.id = 'avatar-foto';
+    img.src = foto;
+    avatar.appendChild(img);
+  }
+}
+
 function anexarArquivo(event, id) {
   const file = event.target.files[0];
   if (!file) return;
@@ -1404,6 +1449,7 @@ function mostrarToast(msg) {
 }
 
 carregarLocal();
+carregarFoto();
 renderProjects();
 </script>
 </body>
