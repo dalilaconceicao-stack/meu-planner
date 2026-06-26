@@ -963,6 +963,7 @@ body {
           <option value="andamento">Em andamento</option>
           <option value="concluido">Concluído</option>
           <option value="pausado">Pausado</option>
+          <option value="cancelado">Cancelado</option>
         </select>
       </div>
       <div class="form-group">
@@ -1085,7 +1086,7 @@ let projetos = [
 let nextId = 4;
 
 function getStatusLabel(s) {
-  const map = { andamento:'Em andamento', concluido:'Concluído', planejando:'Planejando', pausado:'Pausado' };
+  const map = { andamento:'Em andamento', concluido:'Concluído', planejando:'Planejando', pausado:'Pausado',cancelado: 'Cancelado' };
   return map[s] || s;
 }
 
@@ -1175,6 +1176,7 @@ function renderProjects() {
           <option value="andamento"  ${p.status==='andamento'?'selected':''}>Em andamento</option>
           <option value="concluido"  ${p.status==='concluido'?'selected':''}>Concluído</option>
           <option value="pausado"    ${p.status==='pausado'?'selected':''}>Pausado</option>
+          <option value="cancelado" ${p.status==='cancelado'?'selected':''}>Cancelado</option>
         </select>
         ${renderProgress(p.progresso || 0, p.status)}
       </div>
