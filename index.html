@@ -68,7 +68,7 @@ body {
 }
 
 .brand-icon {
-  width: 150px; height: 150px;
+  width: 170px; height: 170px;
   background: var(--rose);
   border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
@@ -1243,7 +1243,7 @@ function renderProjects() {
       ${p.next ? `<div class="project-notas">→ ${p.next}</div>` : ''}
       ${p.notas ? `<div class="project-anotacoes">📝 ${p.notas}</div>` : ''}
       <div class="project-arquivos">
-        ${(p.arquivos || []).map(a => `<a class="arquivo-item" href="${a.url}" target="_blank">📎 ${a.nome}</a>`).join('')}
+        ${(p.arquivos || []).map((a, i) => `<a class="arquivo-item" href="#" onclick="abrirArquivo('${p.id}', ${i}); return false;">📎 ${a.nome}</a>`).join('')}
         <button class="btn-anexar" onclick="document.getElementById('file-${p.id}').click()">📎 Anexar arquivo</button>
         <input type="file" id="file-${p.id}" style="display:none" onchange="anexarArquivo(event, ${p.id})">
       </div>
@@ -1268,6 +1268,18 @@ function atualizarStats() {
   document.getElementById('stat-concluido').textContent = projetos.filter(p => p.status === 'concluido').length;
   document.getElementById('stat-planejando').textContent= projetos.filter(p => p.status === 'planejando').length;
   document.getElementById('badge-projetos').textContent  = projetos.length;
+}
+
+function abrirArquivo(projetoId, index) {
+  const p = projetos.find(x => x.id == projetoId);
+  if (!p || !p.arquivos || !p.arquivos[index]) return;
+  const arquivo = p.arquivos[index];
+  const win = window.open();
+  win.document.write(`
+    <html><body style="margin:0;background:#222;display:flex;align-items:center;justify-content:center;min-height:100vh;">
+      <iframe src="${arquivo.url}" style="width:95vw;height:95vh;border:none;border-radius:8px;background:white;"></iframe>
+    </body></html>
+  `);
 }
 
 function trocarFoto(event) {
