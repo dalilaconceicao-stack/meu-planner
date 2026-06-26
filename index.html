@@ -410,6 +410,64 @@ body {
   font-style: italic;
 }
 
+.filter-bar {
+  display: flex;
+  align-items: flex-end;
+  gap: 20px;
+  margin-bottom: 24px;
+  background: var(--card);
+  border: 1px solid var(--border-lt);
+  border-radius: 14px;
+  padding: 16px 20px;
+  flex-wrap: wrap;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.filter-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--muted);
+}
+
+.filter-select, .filter-input {
+  padding: 8px 12px;
+  border: 1px solid var(--border-md);
+  border-radius: 8px;
+  font-size: 12px;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--text);
+  background: var(--bg);
+  transition: border-color 0.2s;
+}
+
+.filter-select:focus, .filter-input:focus {
+  outline: none;
+  border-color: var(--rose);
+}
+
+.filter-clear {
+  background: none;
+  border: 1px solid var(--border-md);
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.2s;
+  align-self: flex-end;
+}
+
+.filter-clear:hover { border-color: var(--rose); color: var(--rose-dk); }
+
 .project-anotacoes {
   background: #fdf5e0;
   border-left: 2px solid var(--amber);
@@ -850,6 +908,29 @@ body {
       </div>
     </div>
 
+    <div class="filter-bar">
+      <div class="filter-group">
+        <label class="filter-label">Status</label>
+        <select class="filter-select" id="filter-status" onchange="aplicarFiltros()">
+          <option value="">Todos</option>
+          <option value="andamento">Em andamento</option>
+          <option value="planejando">Planejando</option>
+          <option value="concluido">Concluído</option>
+          <option value="pausado">Pausado</option>
+          <option value="cancelado">Cancelado</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label class="filter-label">Período de encerramento</label>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <input class="filter-input" type="month" id="filter-de" onchange="aplicarFiltros()" placeholder="De">
+          <span style="color:var(--muted);font-size:12px;">até</span>
+          <input class="filter-input" type="month" id="filter-ate" onchange="aplicarFiltros()" placeholder="Até">
+        </div>
+      </div>
+      <button class="filter-clear" onclick="limparFiltros()">✕ Limpar filtros</button>
+    </div>
+
     <div class="projects-grid" id="projects-grid"></div>
   </div>
 
@@ -1224,6 +1305,7 @@ function carregarLocal() {
 }
 
 function renderProjects() {
+  if (typeof aplicarFiltros === 'function') { aplicarFiltros(); return; }
   const grid = document.getElementById('projects-grid');
   grid.innerHTML = projetos.map(p => {
     const colorClass = CARD_COLORS[p.color % CARD_COLORS.length];
@@ -1268,6 +1350,70 @@ function atualizarStats() {
   document.getElementById('stat-concluido').textContent = projetos.filter(p => p.status === 'concluido').length;
   document.getElementById('stat-planejando').textContent= projetos.filter(p => p.status === 'planejando').length;
   document.getElementById('badge-projetos').textContent  = projetos.length;
+}
+
+// ============================================================
+// FILTROS
+// ============================================================
+
+function aplicarFiltros() {
+  const status  = document.getElementById('filter-status').value;
+  const de      = document.getElementById('filter-de').value;
+  const ate     = document.getElementById('filter-ate').value;
+
+  let lista = [...projetos];
+
+  // Ordena por data de conclusão (mais próxima primeiro, sem data no final)
+  lista.sort((a, b) => {
+    if (!a.conclusao && !b.conclusao) return 0;
+    if (!a.conclusao) return 1;
+    if (!b.conclusao) return -1;
+    return new Date(a.conclusao) - new Date(b.conclusao);
+  });
+
+  if (status) {
+    lista = lista.filter(p => p.status === status);
+  }
+
+  if (de) {
+    lista = lista.filter(p => p.prazo >= de);
+  }
+
+  if (ate) {
+    lista = lista.filter(p => p.prazo <= ate);
+  }
+
+  renderProjectsLista(lista);
+}
+
+function limparFiltros() {
+  document.getElementById('filter-status').value = '';
+  document.getElementById('filter-de').value = '';
+  document.getElementById('filter-ate').value = '';
+  aplicarFiltros();
+}
+
+// ============================================================
+// INTEGRAÇÃO PDI — projeto concluído
+// ============================================================
+
+function registrarAprendizadoNoPDI(projeto) {
+  const data = projeto.conclusao
+    ? formatarData(projeto.conclusao)
+    : new Date().toLocaleDateString('pt-BR');
+
+  const entrada = `✅ ${projeto.nome} — concluído em ${data}` +
+    (projeto.aprendizado ? `
+💡 ${projeto.aprendizado}` : '');
+
+  const textarea = document.getElementById('pdi-resultados');
+  const atual = textarea.value.trim();
+  textarea.value = atual ? entrada + '
+
+' + atual : entrada;
+
+  salvarPDI();
+  mostrarToast('🌱 Aprendizado registrado no PDI!');
 }
 
 function abrirArquivo(projetoId, index) {
@@ -1358,7 +1504,7 @@ function abrirModalProjeto() {
 
 function fecharModal() {
   document.getElementById('modal-projeto').classList.remove('open');
-  ['proj-nome','proj-desc','proj-next','proj-prazo','proj-inicio','proj-conclusao','proj-progresso'].forEach(id => {
+  ['proj-nome','proj-desc','proj-next','proj-prazo','proj-inicio','proj-conclusao','proj-progresso','proj-aprendizado'].forEach(id => {
     document.getElementById(id).value = '';
   });
   document.getElementById('proj-status').value = 'planejando';
@@ -1376,8 +1522,10 @@ function salvarProjeto() {
     inicio:     document.getElementById('proj-inicio').value,
     conclusao:  document.getElementById('proj-conclusao').value,
     next:       document.getElementById('proj-next').value.trim(),
-    progresso:  parseInt(document.getElementById('proj-progresso').value) || 0,
-    color:      (projetos.length) % CARD_COLORS.length
+    progresso:    parseInt(document.getElementById('proj-progresso').value) || 0,
+    aprendizado:  document.getElementById('proj-aprendizado').value.trim(),
+    color:        (projetos.length) % CARD_COLORS.length,
+    notas: '', arquivos: []
   });
   fecharModal();
   salvarLocal();
@@ -1398,6 +1546,7 @@ function abrirModalEditar(id) {
   document.getElementById('edit-next').value       = p.next || '';
   document.getElementById('edit-progresso').value  = p.progresso || 0;
   document.getElementById('edit-notas').value       = p.notas || '';
+  document.getElementById('edit-aprendizado').value = p.aprendizado || '';
   document.getElementById('modal-editar').classList.add('open');
 }
 
@@ -1417,7 +1566,13 @@ function salvarEdicao() {
   p.conclusao = document.getElementById('edit-conclusao').value;
   p.next      = document.getElementById('edit-next').value.trim();
   p.progresso = parseInt(document.getElementById('edit-progresso').value) || 0;
-  p.notas     = document.getElementById('edit-notas').value.trim();
+  p.notas       = document.getElementById('edit-notas').value.trim();
+  p.aprendizado = document.getElementById('edit-aprendizado').value.trim();
+  const eraStatus = p.status;
+  p.status = document.getElementById('edit-status').value;
+  if (p.status === 'concluido' && eraStatus !== 'concluido') {
+    registrarAprendizadoNoPDI(p);
+  }
   fecharModalEditar();
   salvarLocal();
   renderProjects();
