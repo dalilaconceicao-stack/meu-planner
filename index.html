@@ -411,9 +411,8 @@ function jsonp(url) {
 
 async function salvarSheets() {
   try {
-    const form = new FormData();
-    form.append('payload', JSON.stringify({ acao: "salvarProjetos", projetos }));
-    await fetch(API_URL, { method: "POST", body: JSON.stringify({ acao: "salvarProjetos", projetos }), mode: "no-cors" });
+    const dados = encodeURIComponent(JSON.stringify(projetos));
+    await jsonp(API_URL + "?acao=salvarProjetos&dados=" + dados);
   } catch(e) { console.warn("Erro ao salvar projetos:", e); }
 }
 
@@ -743,11 +742,8 @@ function salvarPDI() {
   };
   localStorage.setItem('planner_pdi', JSON.stringify(pdiData));
   try {
-    fetch(API_URL, {
-      method: "POST",
-      body: JSON.stringify({ acao: "salvarPDI", pdi: pdiData }),
-      mode: "no-cors"
-    });
+    const dados = encodeURIComponent(JSON.stringify(pdiData));
+    jsonp(API_URL + "?acao=salvarPDI&dados=" + dados);
   } catch(e) {}
   mostrarToast('PDI salvo com sucesso! 💾');
 }
