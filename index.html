@@ -213,7 +213,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
     <div class="page-header">
       <div>
         <div class="page-title">Meus Projetos</div>
-        <div class="page-subtitle">Acompanhe tudo que você está construindo ✨</div>
+        <div class="page-subtitle">Acompanhe tudo o que a Dalila está construindo ✨</div>
       </div>
       <button class="btn-primary" onclick="abrirModalProjeto()">+ Novo Projeto</button>
     </div>
@@ -411,8 +411,15 @@ function jsonp(url) {
 
 async function salvarSheets() {
   try {
-    const dados = encodeURIComponent(JSON.stringify(projetos));
-    jsonp(API_URL + "?acao=salvarProjetos&dados=" + dados);
+    // Projetos sem arquivos (base64 pesa muito na URL)
+    const projetosLeves = projetos.map(p => ({
+      id: p.id, nome: p.nome, desc: p.desc, status: p.status,
+      prazo: p.prazo, inicio: p.inicio, conclusao: p.conclusao,
+      next: p.next, progresso: p.progresso, notas: p.notas,
+      aprendizado: p.aprendizado, color: p.color, arquivos: []
+    }));
+    const dados = encodeURIComponent(JSON.stringify(projetosLeves));
+    await jsonp(API_URL + "?acao=salvarProjetos&dados=" + dados);
   } catch(e) { console.warn("Erro ao salvar projetos:", e); }
 }
 
