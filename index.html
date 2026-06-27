@@ -37,7 +37,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 .brand-icon { width: 170px; height: 170px; background: var(--rose); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; margin-bottom: 12px; box-shadow: 0 4px 12px rgba(224,145,184,0.35); overflow: hidden; cursor: pointer; border: 3px solid rgba(255,255,255,0.6); transition: all 0.2s; }
 .brand-icon:hover { opacity: 0.85; }
 .brand-icon img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
-.brand-name { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: var(--text); line-height: 1.2; }
+.brand-name { font-family: 'Playfair Display', serif; font-size: 34px; font-weight: 700; color: var(--text); line-height: 1.2; }
 .brand-sub { font-size: 11px; color: var(--muted); margin-top: 3px; letter-spacing: 0.3px; }
 .sidebar-nav { padding: 18px 12px; flex: 1; }
 .nav-label { font-size: 9px; font-weight: 500; text-transform: uppercase; letter-spacing: 1.8px; color: var(--muted); padding: 0 10px; margin-bottom: 6px; margin-top: 18px; }
@@ -396,42 +396,47 @@ function salvarLocal() {
   salvarSheets();
 }
 
+// JSONP helper — contorna CORS no Google Apps Script
+function jsonp(url) {
+  return new Promise((resolve, reject) => {
+    const cb = 'cb_' + Date.now();
+    const script = document.createElement('script');
+    script.src = url + '&callback=' + cb;
+    window[cb] = (data) => { delete window[cb]; document.head.removeChild(script); resolve(data); };
+    script.onerror = reject;
+    document.head.appendChild(script);
+    setTimeout(() => { delete window[cb]; try { document.head.removeChild(script); } catch(e) {} reject(new Error('timeout')); }, 10000);
+  });
+}
+
 async function salvarSheets() {
   try {
-    await fetch(API_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ acao: "salvarProjetos", projetos }),
-    });
-  } catch(e) { console.warn("Erro ao salvar projetos no Sheets:", e); }
+    const form = new FormData();
+    form.append('payload', JSON.stringify({ acao: "salvarProjetos", projetos }));
+    await fetch(API_URL, { method: "POST", body: JSON.stringify({ acao: "salvarProjetos", projetos }), mode: "no-cors" });
+  } catch(e) { console.warn("Erro ao salvar projetos:", e); }
 }
 
 async function carregarLocal() {
-  // Tenta carregar do Sheets primeiro
+  // Carrega projetos via JSONP
   try {
-    const res = await fetch(API_URL + "?acao=carregarProjetos");
-    const data = await res.json();
+    const data = await jsonp(API_URL + "?acao=carregarProjetos");
     if (data.sucesso && data.projetos && data.projetos.length) {
       projetos = data.projetos;
       nextId = Math.max(...projetos.map(p => Number(p.id) || 0)) + 1;
       localStorage.setItem('planner_projetos', JSON.stringify(projetos));
     } else {
-      // Fallback para localStorage
       const p = localStorage.getItem('planner_projetos');
       if (p) { projetos = JSON.parse(p); nextId = parseInt(localStorage.getItem('planner_nextid')) || projetos.length + 1; }
     }
   } catch(e) {
-    // Fallback para localStorage se Sheets falhar
-    try {
-      const p = localStorage.getItem('planner_projetos');
-      if (p) { projetos = JSON.parse(p); nextId = parseInt(localStorage.getItem('planner_nextid')) || projetos.length + 1; }
-    } catch(e2) {}
+    const p = localStorage.getItem('planner_projetos');
+    if (p) { try { projetos = JSON.parse(p); nextId = parseInt(localStorage.getItem('planner_nextid')) || projetos.length + 1; } catch(e2) {} }
   }
 
-  // Carrega PDI
+  // Carrega PDI via JSONP
   try {
-    const res = await fetch(API_URL + "?acao=carregarPDI");
-    const data = await res.json();
+    const data = await jsonp(API_URL + "?acao=carregarPDI");
     if (data.sucesso && data.pdi) {
       const pdi = data.pdi;
       if (pdi.ondeEstou)  document.getElementById('pdi-onde-estou').value  = pdi.ondeEstou;
@@ -449,7 +454,6 @@ async function carregarLocal() {
       }
     }
   } catch(e) {
-    // Fallback localStorage PDI
     try {
       const pdi = JSON.parse(localStorage.getItem('planner_pdi') || '{}');
       if (pdi.ondeEstou)  document.getElementById('pdi-onde-estou').value  = pdi.ondeEstou;
@@ -741,8 +745,8 @@ function salvarPDI() {
   try {
     fetch(API_URL, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ acao: "salvarPDI", pdi: pdiData }),
+      mode: "no-cors"
     });
   } catch(e) {}
   mostrarToast('PDI salvo com sucesso! 💾');
