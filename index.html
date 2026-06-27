@@ -213,7 +213,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
     <div class="page-header">
       <div>
         <div class="page-title">Meus Projetos</div>
-        <div class="page-subtitle">Acompanhe tudo que a Dalila está construindo ✨</div>
+        <div class="page-subtitle">Acompanhe tudo que você está construindo ✨</div>
       </div>
       <button class="btn-primary" onclick="abrirModalProjeto()">+ Novo Projeto</button>
     </div>
@@ -388,7 +388,7 @@ let projetos = [];
 let nextId = 1;
 
 // ── API GOOGLE SHEETS ──
-const API_URL = "https://script.google.com/a/macros/mercadolivre.com/s/AKfycbzPsvTF169R6AhcD225A-DoSYX1mtikXVIuNXie_51Ko-DC5RBkg9OkywO7nfnD68e6/exec";
+const API_URL = "https://script.google.com/a/macros/mercadolivre.com/s/AKfycbzE1VuOlBS-wKqRU_f5ekpgxB-oz44Rgb-ucNktBtdPQu7BY33NUvxHjv5DeD1VeDS5/exec";
 
 function salvarLocal() {
   localStorage.setItem('planner_projetos', JSON.stringify(projetos));
@@ -412,8 +412,28 @@ function jsonp(url) {
 async function salvarSheets() {
   try {
     const dados = encodeURIComponent(JSON.stringify(projetos));
-    await jsonp(API_URL + "?acao=salvarProjetos&dados=" + dados);
+    jsonp(API_URL + "?acao=salvarProjetos&dados=" + dados);
   } catch(e) { console.warn("Erro ao salvar projetos:", e); }
+}
+
+async function salvarFotoSheets(fotoBase64) {
+  try {
+    const dados = encodeURIComponent(JSON.stringify({ foto: fotoBase64 }));
+    await jsonp(API_URL + "?acao=salvarFoto&dados=" + dados);
+  } catch(e) { console.warn("Erro ao salvar foto:", e); }
+}
+
+async function carregarFotoSheets() {
+  try {
+    const data = await jsonp(API_URL + "?acao=carregarFoto");
+    if (data.sucesso && data.foto) {
+      aplicarFoto(data.foto);
+      localStorage.setItem('planner_foto', data.foto);
+    }
+  } catch(e) {
+    const foto = localStorage.getItem('planner_foto');
+    if (foto) aplicarFoto(foto);
+  }
 }
 
 async function carregarLocal() {
@@ -478,7 +498,12 @@ async function carregarLocal() {
 function trocarFoto(e) {
   const file = e.target.files[0]; if (!file) return;
   const reader = new FileReader();
-  reader.onload = function(ev) { aplicarFoto(ev.target.result); localStorage.setItem('planner_foto', ev.target.result); mostrarToast('📸 Foto atualizada!'); };
+  reader.onload = function(ev) {
+    aplicarFoto(ev.target.result);
+    localStorage.setItem('planner_foto', ev.target.result);
+    salvarFotoSheets(ev.target.result);
+    mostrarToast('📸 Foto atualizada!');
+  };
   reader.readAsDataURL(file);
 }
 
@@ -583,7 +608,11 @@ function renderProjects() {
       ${p.next ? `<div class="project-notas">→ ${p.next}</div>` : ''}
       ${p.notas ? `<div class="project-anotacoes">📝 ${p.notas}</div>` : ''}
       <div class="project-arquivos">
-        ${arquivos.map((a, i) => `<a class="arquivo-item" href="#" onclick="abrirArquivo(${p.id}, ${i}); return false;">📎 ${a.nome}</a>`).join('')}
+        ${arquivos.map((a, i) => `
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px;">
+            <a class="arquivo-item" style="flex:1;margin-bottom:0" href="#" onclick="abrirArquivo(${p.id}, ${i}); return false;">📎 ${a.nome}</a>
+            <span style="cursor:pointer;font-size:14px;opacity:0.5;padding:4px;" onclick="removerArquivo(${p.id}, ${i})" title="Remover arquivo">🗑</span>
+          </div>`).join('')}
         <button class="btn-anexar" onclick="document.getElementById('file-${p.id}').click()">📎 Anexar arquivo</button>
         <input type="file" id="file-${p.id}" style="display:none" onchange="anexarArquivo(event, ${p.id})">
       </div>
@@ -709,6 +738,16 @@ function anexarArquivo(event, id) {
   reader.readAsDataURL(file);
 }
 
+function removerArquivo(projetoId, index) {
+  const p = projetos.find(x => x.id === projetoId);
+  if (!p || !p.arquivos) return;
+  if (!confirm('Remover "' + p.arquivos[index].nome + '"?')) return;
+  p.arquivos.splice(index, 1);
+  salvarLocal();
+  renderProjects();
+  mostrarToast('📎 Arquivo removido!');
+}
+
 function abrirArquivo(projetoId, index) {
   const p = projetos.find(x => x.id === projetoId);
   if (!p || !p.arquivos || !p.arquivos[index]) return;
@@ -719,11 +758,12 @@ function abrirArquivo(projetoId, index) {
 // ── PDI ──
 function registrarAprendizadoNoPDI(projeto) {
   const data = projeto.conclusao ? formatDate(projeto.conclusao) : new Date().toLocaleDateString('pt-BR');
-  const entrada = `✅ ${projeto.nome} — concluído em ${data}` + (projeto.aprendizado ? `\n💡 ${projeto.aprendizado}` : '');
+  const entrada = '✅ ' + projeto.nome + ' — concluído em ' + data + (projeto.aprendizado ? '\n💡 ' + projeto.aprendizado : '');
   const textarea = document.getElementById('pdi-resultados');
-  textarea.value = atual => entrada + (textarea.value.trim() ? '\n\n' + textarea.value.trim() : '');
-  textarea.value = entrada + (textarea.value.trim() && textarea.value !== entrada ? '\n\n' + textarea.value : '');
-  salvarPDI(); mostrarToast('🌱 Aprendizado registrado no PDI!');
+  const atual = textarea.value.trim();
+  textarea.value = atual ? entrada + '\n\n' + atual : entrada;
+  salvarPDI();
+  mostrarToast('🌱 Aprendizado registrado no PDI!');
 }
 
 function salvarPDI() {
@@ -742,8 +782,7 @@ function salvarPDI() {
   };
   localStorage.setItem('planner_pdi', JSON.stringify(pdiData));
   try {
-    const dados = encodeURIComponent(JSON.stringify(pdiData));
-    jsonp(API_URL + "?acao=salvarPDI&dados=" + dados);
+    jsonp(API_URL + "?acao=salvarPDI&dados=" + encodeURIComponent(JSON.stringify(pdiData)));
   } catch(e) {}
   mostrarToast('PDI salvo com sucesso! 💾');
 }
