@@ -32,7 +32,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 
 /* SIDEBAR */
 .sidebar { width: 240px; min-height: 100vh; background: var(--sidebar-bg); border-right: 1px solid var(--border-md); display: flex; flex-direction: column; padding: 28px 0; flex-shrink: 0; position: relative; }
-.sidebar::after { content: '🌸'; position: absolute; bottom: 170px; right: 12px; font-size: 48px; opacity: 0.07; pointer-events: none; }
+.sidebar::after { content: '🌸'; position: absolute; bottom: 80px; right: 12px; font-size: 48px; opacity: 0.07; pointer-events: none; }
 .sidebar-brand { padding: 0 22px 24px; border-bottom: 1px solid var(--border-md); }
 .brand-icon { width: 170px; height: 170px; background: var(--rose); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; margin-bottom: 12px; box-shadow: 0 4px 12px rgba(224,145,184,0.35); overflow: hidden; cursor: pointer; border: 3px solid rgba(255,255,255,0.6); transition: all 0.2s; }
 .brand-icon:hover { opacity: 0.85; }
@@ -387,33 +387,88 @@ const CARD_COLORS = ['color-rose','color-lilac','color-sage','color-amber'];
 let projetos = [];
 let nextId = 1;
 
-// ── LOCALSTORAGE ──
+// ── API GOOGLE SHEETS ──
+const API_URL = "https://script.google.com/macros/s/AKfycbz6bUqbaSBs_9JlHYsnnkp8CIKGeDRc0swGvMjO4hFVHs_MB0oNj0WB1GePNa5qVtc8jA/exec";
+
 function salvarLocal() {
   localStorage.setItem('planner_projetos', JSON.stringify(projetos));
   localStorage.setItem('planner_nextid', nextId);
+  salvarSheets();
 }
 
-function carregarLocal() {
+async function salvarSheets() {
   try {
-    const p = localStorage.getItem('planner_projetos');
-    if (p) { projetos = JSON.parse(p); nextId = parseInt(localStorage.getItem('planner_nextid')) || projetos.length + 1; }
-  } catch(e) {}
+    await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ acao: "salvarProjetos", projetos }),
+    });
+  } catch(e) { console.warn("Erro ao salvar projetos no Sheets:", e); }
+}
+
+async function carregarLocal() {
+  // Tenta carregar do Sheets primeiro
   try {
-    const pdi = JSON.parse(localStorage.getItem('planner_pdi') || '{}');
-    if (pdi.ondeEstou)  document.getElementById('pdi-onde-estou').value  = pdi.ondeEstou;
-    if (pdi.ondeVou)    document.getElementById('pdi-onde-vou').value    = pdi.ondeVou;
-    if (pdi.resultados) document.getElementById('pdi-resultados').value  = pdi.resultados;
-    if (pdi.acoes && pdi.acoes.length) {
-      const lista = document.getElementById('acoes-list');
-      lista.innerHTML = pdi.acoes.map(a => `
-        <div class="acao-item">
-          <div class="acao-check ${a.done?'done':''}" onclick="toggleAcao(this)">${a.done?'✓':''}</div>
-          <span class="acao-text ${a.done?'done':''}">${a.texto}</span>
-          <span class="acao-prazo">${a.prazo}</span>
-        </div>`).join('');
-      atualizarContadorAcoes();
+    const res = await fetch(API_URL + "?acao=carregarProjetos");
+    const data = await res.json();
+    if (data.sucesso && data.projetos && data.projetos.length) {
+      projetos = data.projetos;
+      nextId = Math.max(...projetos.map(p => Number(p.id) || 0)) + 1;
+      localStorage.setItem('planner_projetos', JSON.stringify(projetos));
+    } else {
+      // Fallback para localStorage
+      const p = localStorage.getItem('planner_projetos');
+      if (p) { projetos = JSON.parse(p); nextId = parseInt(localStorage.getItem('planner_nextid')) || projetos.length + 1; }
     }
-  } catch(e) {}
+  } catch(e) {
+    // Fallback para localStorage se Sheets falhar
+    try {
+      const p = localStorage.getItem('planner_projetos');
+      if (p) { projetos = JSON.parse(p); nextId = parseInt(localStorage.getItem('planner_nextid')) || projetos.length + 1; }
+    } catch(e2) {}
+  }
+
+  // Carrega PDI
+  try {
+    const res = await fetch(API_URL + "?acao=carregarPDI");
+    const data = await res.json();
+    if (data.sucesso && data.pdi) {
+      const pdi = data.pdi;
+      if (pdi.ondeEstou)  document.getElementById('pdi-onde-estou').value  = pdi.ondeEstou;
+      if (pdi.ondeVou)    document.getElementById('pdi-onde-vou').value    = pdi.ondeVou;
+      if (pdi.resultados) document.getElementById('pdi-resultados').value  = pdi.resultados;
+      if (pdi.acoes && pdi.acoes.length) {
+        const lista = document.getElementById('acoes-list');
+        lista.innerHTML = pdi.acoes.map(a => `
+          <div class="acao-item">
+            <div class="acao-check ${a.done?'done':''}" onclick="toggleAcao(this)">${a.done?'✓':''}</div>
+            <span class="acao-text ${a.done?'done':''}">${a.texto}</span>
+            <span class="acao-prazo">${a.prazo}</span>
+          </div>`).join('');
+        atualizarContadorAcoes();
+      }
+    }
+  } catch(e) {
+    // Fallback localStorage PDI
+    try {
+      const pdi = JSON.parse(localStorage.getItem('planner_pdi') || '{}');
+      if (pdi.ondeEstou)  document.getElementById('pdi-onde-estou').value  = pdi.ondeEstou;
+      if (pdi.ondeVou)    document.getElementById('pdi-onde-vou').value    = pdi.ondeVou;
+      if (pdi.resultados) document.getElementById('pdi-resultados').value  = pdi.resultados;
+      if (pdi.acoes && pdi.acoes.length) {
+        const lista = document.getElementById('acoes-list');
+        lista.innerHTML = pdi.acoes.map(a => `
+          <div class="acao-item">
+            <div class="acao-check ${a.done?'done':''}" onclick="toggleAcao(this)">${a.done?'✓':''}</div>
+            <span class="acao-text ${a.done?'done':''}">${a.texto}</span>
+            <span class="acao-prazo">${a.prazo}</span>
+          </div>`).join('');
+        atualizarContadorAcoes();
+      }
+    } catch(e2) {}
+  }
+
+  renderProjects();
 }
 
 // ── FOTO ──
@@ -676,12 +731,20 @@ function salvarPDI() {
     const prazo = item.querySelector('.acao-prazo');
     acoes.push({ texto: texto ? texto.textContent : '', prazo: prazo ? prazo.textContent : '', done: check ? check.classList.contains('done') : false });
   });
-  localStorage.setItem('planner_pdi', JSON.stringify({
+  const pdiData = {
     ondeEstou:  document.getElementById('pdi-onde-estou').value,
     ondeVou:    document.getElementById('pdi-onde-vou').value,
     resultados: document.getElementById('pdi-resultados').value,
     acoes
-  }));
+  };
+  localStorage.setItem('planner_pdi', JSON.stringify(pdiData));
+  try {
+    fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ acao: "salvarPDI", pdi: pdiData }),
+    });
+  } catch(e) {}
   mostrarToast('PDI salvo com sucesso! 💾');
 }
 
@@ -724,9 +787,8 @@ function mostrarToast(msg) {
 }
 
 // ── INIT ──
-carregarLocal();
 carregarFoto();
-renderProjects();
+carregarLocal();
 </script>
 </body>
 </html>
