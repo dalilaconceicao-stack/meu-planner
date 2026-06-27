@@ -1,6 +1,6 @@
 /**
  * Backend do Meu Planner — Google Apps Script
- * Vinculado à planilha: https://docs.google.com/spreadsheets/d/1Z3tQZtCOP6rLAmqIefqAbLpQwmnqRemGSx_iPbiGIms
+ * Vinculado à planilha: https://docs.google.com/spreadsheets/d/1QBUOd9yjOTvlqdGJBq592Wi329V2TqY0k2w-X3uaPRQ
  *
  * Responde via JSONP (callback) para contornar CORS, exatamente como o index.html espera.
  * Ações suportadas (parâmetro ?acao=):
@@ -10,7 +10,7 @@
  *   - carregarPDI                   -> { sucesso, pdi: {...} }
  */
 
-var SHEET_ID = "1Z3tQZtCOP6rLAmqIefqAbLpQwmnqRemGSx_iPbiGIms";
+var SHEET_ID = "1QBUOd9yjOTvlqdGJBq592Wi329V2TqY0k2w-X3uaPRQ";
 var ABA_PROJETOS = "Projetos";
 var ABA_PDI = "PDI";
 

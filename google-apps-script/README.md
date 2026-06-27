@@ -8,7 +8,7 @@ para a planilha nova) e trocar a URL no `index.html`.
 
 ## 1. Abrir o editor de Apps Script
 
-1. Abra a planilha: https://docs.google.com/spreadsheets/d/1Z3tQZtCOP6rLAmqIefqAbLpQwmnqRemGSx_iPbiGIms
+1. Abra a planilha: https://docs.google.com/spreadsheets/d/1QBUOd9yjOTvlqdGJBq592Wi329V2TqY0k2w-X3uaPRQ
 2. Menu **Extensões → Apps Script**.
 3. Apague todo o conteúdo do arquivo `Código.gs` e cole o conteúdo de [`Code.gs`](./Code.gs).
 4. Salve (ícone de disquete).
