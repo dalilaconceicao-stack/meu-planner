@@ -411,15 +411,43 @@ function jsonp(url) {
 
 async function salvarSheets() {
   try {
-    // Projetos sem arquivos (base64 pesa muito na URL)
     const projetosLeves = projetos.map(p => ({
       id: p.id, nome: p.nome, desc: p.desc, status: p.status,
       prazo: p.prazo, inicio: p.inicio, conclusao: p.conclusao,
       next: p.next, progresso: p.progresso, notas: p.notas,
       aprendizado: p.aprendizado, color: p.color, arquivos: []
     }));
-    const dados = encodeURIComponent(JSON.stringify(projetosLeves));
-    await jsonp(API_URL + "?acao=salvarProjetos&dados=" + dados);
+
+    // Usa iframe oculto para POST sem limite de tamanho e sem CORS
+    const iframeId = 'save-frame-' + Date.now();
+    const iframe = document.createElement('iframe');
+    iframe.name = iframeId;
+    iframe.style.display = 'none';
+    document.body.appendChild(iframe);
+
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = API_URL;
+    form.target = iframeId;
+    form.style.display = 'none';
+
+    const inputAcao = document.createElement('input');
+    inputAcao.name = 'acao';
+    inputAcao.value = 'salvarProjetos';
+    form.appendChild(inputAcao);
+
+    const inputDados = document.createElement('input');
+    inputDados.name = 'dados';
+    inputDados.value = JSON.stringify(projetosLeves);
+    form.appendChild(inputDados);
+
+    document.body.appendChild(form);
+    form.submit();
+
+    setTimeout(() => {
+      try { document.body.removeChild(form); document.body.removeChild(iframe); } catch(e) {}
+    }, 3000);
+
   } catch(e) { console.warn("Erro ao salvar projetos:", e); }
 }
 
