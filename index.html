@@ -604,12 +604,26 @@ function renderProjects() {
 
   let lista = [...projetos];
 
-  // Ordena por data de conclusão (mais próxima primeiro)
+  // Ordena: ativos em cima (por prazo, mais urgente primeiro), concluídos/cancelados embaixo (mais recentes primeiro)
+  const ordemStatus = { 'andamento': 0, 'planejando': 1, 'pausado': 2, 'concluido': 3, 'cancelado': 4 };
   lista.sort((a, b) => {
+    const ga = ordemStatus[a.status] ?? 2;
+    const gb = ordemStatus[b.status] ?? 2;
+    if (ga !== gb) return ga - gb;
+
+    // Dentro dos ativos: prazo mais próximo primeiro (sem prazo vai pro final)
+    if (ga < 3) {
+      if (!a.prazo && !b.prazo) return 0;
+      if (!a.prazo) return 1;
+      if (!b.prazo) return -1;
+      return new Date(a.prazo) - new Date(b.prazo);
+    }
+
+    // Dentro dos concluídos/cancelados: data de conclusão mais recente primeiro
     if (!a.conclusao && !b.conclusao) return 0;
     if (!a.conclusao) return 1;
     if (!b.conclusao) return -1;
-    return new Date(a.conclusao) - new Date(b.conclusao);
+    return new Date(b.conclusao) - new Date(a.conclusao);
   });
 
   if (filtroStatus) lista = lista.filter(p => p.status === filtroStatus);
